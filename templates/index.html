@@ -1,0 +1,68 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Socket-Test</title>
+    <script src="//code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+    <script type="text/javascript" charset="utf-8">
+        $(document).ready(function() {
+
+            namespace = '/test';
+            var socket = io(namespace);
+
+            socket.on('connect', function() {
+                socket.emit('my_event', {data: 'connected to the SocketServer...'});
+            });
+
+            socket.on('my_response', function(msg, cb) {
+                $('#log').append('<br>' + $('<div/>').text('logs #' + msg.count + ': ' + msg.data).html());
+                if (cb)
+                    cb();
+            });
+
+
+            socket.on('character_chosen_local', function(id,cb) {
+                $('#header').append('<br>' + $('<div/>').text(id.data + " chosen").html());
+
+                if (cb)
+                    cb();
+            })
+
+            socket.on('character_chosen_global', function(id,cb) {
+                $('#'+id.data).attr('disabled','disabled');
+
+                if (cb)
+                    cb();
+            })
+
+
+            $('form#broadcast').submit(function(event) {
+                socket.emit('my_broadcast_event', {data: $('#broadcast_data').val()});
+                return false;
+            });
+
+            //this defines that all button clicks perform this event
+            $('button').click(function(event) {
+                console.log()
+                socket.emit('character_chosen', {data: $(this).attr('id')});
+                return false;
+            });
+        });
+    </script>
+</head>
+<body style="background-color:white;">
+
+    <button id="Button1">Button 1</button>
+    <button id="Button2">Button 2</button>
+
+    <h1 id="header" style="background-color:white;"></h1>
+
+    <form id="broadcast" method="POST" action='#'>
+        <input type="text" name="broadcast_data" id="broadcast_data" placeholder="Message">
+        <input type="submit" value="Send Broadcast Message">
+    </form>
+
+    <h2 style="background-color:white;">Logs</h2>
+    <div id="log" ></div>
+</body>
+</html>
