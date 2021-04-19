@@ -4,24 +4,16 @@
     <title>Socket-Test</title>
     <script src="//code.jquery.com/jquery-1.12.4.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+    <style>
+        .hidden{
+            visibility: hidden;
+        }
+    </style>
     <script type="text/javascript" charset="utf-8">
         $(document).ready(function() {
 
             namespace = '/test';
             var socket = io(namespace);
-
-
-            // code for getting usernames of people in room
-            // socket.nickname = 'Earl';
-            // socket.join('chatroom1');
-
-            // console.log('User joined chat room 1');
-                
-            // var roster = io.sockets.clients('chatroom1');
-                    
-            // roster.forEach(function(client) {
-            //     console.log('Username: ' + client.nickname);
-            // });
 
             socket.on('connect', function() {
                 socket.emit('my_event', {data: 'connected to the SocketServer...'});
@@ -33,7 +25,6 @@
                     cb();
             });
 
-
             socket.on('character_chosen_local', function(id,cb) {
                 $('#header').html((id.data + " chosen"));
                 socket.character = id.data;
@@ -41,13 +32,13 @@
                     cb();
             })
 
-            socket.on('character_chosen_global', function(id,cb) {
-                $('#'+id.data).attr('disabled','disabled');
-
+            socket.on('character_chosen_global', function(msg,cb) {
+                $('#'+msg.data).attr('disabled','disabled');
+                console.log("disabled" + msg.data)
+                $('#log').append('<br>' + $('<div/>').text('logs #' + msg.count + ': '+ msg.username + " has chosen " + msg.data).html());
                 if (cb)
                     cb();
             })
-
 
             $('form#broadcast').submit(function(event) {
                 socket.emit('my_broadcast_event', {data: $('#broadcast_data').val()});
@@ -58,12 +49,15 @@
                 console.log("here")
                 socket.nickname = $('#username_data').val()
                 socket.emit('username_event', {data: $('#username_data').val()});
+                $('#username').html("");
+                $('.creature').css("visibility","visible")
                 return false;
             });
 
             //this defines that all button clicks perform this event
             $('button').click(function(event) {
                 console.log()
+                socket.character = $(this).attr('id')
                 socket.emit('character_chosen', {data: $(this).attr('id')});
                 return false;
             });
@@ -72,27 +66,24 @@
 </head>
 <body style="background-color:white;">
 
-    <button id="Godzilla">Godzilla</button>
-    <button id="Soda Bottle">Soda Bottle</button>
+    <button class="hidden creature" id="Godzilla">Godzilla</button>
+    <button class="hidden creature" id="SodaBottle">Soda Bottle</button>
 
     <h1 id="header" style="background-color:white;"></h1>
 
-    <form id="broadcast" method="POST" action='#'>
+    <!-- <form id="broadcast" method="POST" action='#'>
         <input type="text" name="broadcast_data" id="broadcast_data" placeholder="Message">
         <input type="submit" value="Send Broadcast Message">
-    </form>
+    </form> -->
 
     <form id="username" method="POST" action='#'>
         <input type="text" name="username_data" id="username_data" placeholder="Username">
         <input type="submit" value="Username">
     </form>
 
-    <br>
-
-    <!-- <form id="username" method="POST" action='#'>
-        <input type="text" name="username_data" id="username_data" placeholder="username">
-        <input type="submit" value="Enter Username">
-    </form> -->
+    <form class="hidden" id="start" method="POST" action='#'>
+        <input type="submit" value="start">
+    </form>
 
     <h2 style="background-color:white;">Logs</h2>
     <div id="log" ></div>

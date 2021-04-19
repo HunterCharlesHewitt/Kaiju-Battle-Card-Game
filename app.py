@@ -9,11 +9,17 @@ app.config['SECRET_KEY'] = 'secret!'
 socket_ = SocketIO(app, async_mode=async_mode)
 thread = None
 thread_lock = Lock()
+user_name = ''
+character = ''
 
 
 @app.route('/')
 def index():
     return render_template('index.html', async_mode=socket_.async_mode)
+
+@app.route('/battle_menu/<nickname>')
+def battle(nickname):
+    return render_template('battle_menu.html', async_mode=socket_.async_mode)
 
 
 @socket_.on('my_event', namespace='/test')
@@ -25,6 +31,7 @@ def test_message(message):
 
 @socket_.on('my_broadcast_event', namespace='/test')
 def test_broadcast_message(message):
+    print("_____________________________")
     session['receive_count'] = session.get('receive_count', 0) + 1
     emit('my_response',
          {'data': message['data'], 'count': session['receive_count']},
@@ -34,6 +41,8 @@ def test_broadcast_message(message):
 def test_username_message(message):
     session['receive_count'] = session.get('receive_count', 0) + 1
     session['username'] = message['data']
+    user_name = message['data']
+    print(user_name)
     emit('my_response',
          {'data': message['data'] + " has joined", 'count': session['receive_count']},
          broadcast=True)
@@ -45,7 +54,7 @@ def character_chosen(id):
     emit('character_chosen_local',
          {'data': id['data'], 'count': session['receive_count']})
     emit('character_chosen_global',
-         {'data': id['data'], 'count': session['receive_count']},
+         {'data': id['data'], 'count': session['receive_count'],'username':session['username']},
          broadcast=True)
 
 if __name__ == '__main__':
