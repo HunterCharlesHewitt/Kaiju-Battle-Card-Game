@@ -10,6 +10,19 @@
             namespace = '/test';
             var socket = io(namespace);
 
+
+            // code for getting usernames of people in room
+            // socket.nickname = 'Earl';
+            // socket.join('chatroom1');
+
+            // console.log('User joined chat room 1');
+                
+            // var roster = io.sockets.clients('chatroom1');
+                    
+            // roster.forEach(function(client) {
+            //     console.log('Username: ' + client.nickname);
+            // });
+
             socket.on('connect', function() {
                 socket.emit('my_event', {data: 'connected to the SocketServer...'});
             });
@@ -22,8 +35,8 @@
 
 
             socket.on('character_chosen_local', function(id,cb) {
-                $('#header').append('<br>' + $('<div/>').text(id.data + " chosen").html());
-
+                $('#header').html((id.data + " chosen"));
+                socket.character = id.data;
                 if (cb)
                     cb();
             })
@@ -41,6 +54,13 @@
                 return false;
             });
 
+            $('form#username').submit(function(event) {
+                console.log("here")
+                socket.nickname = $('#username_data').val()
+                socket.emit('username_event', {data: $('#username_data').val()});
+                return false;
+            });
+
             //this defines that all button clicks perform this event
             $('button').click(function(event) {
                 console.log()
@@ -52,8 +72,8 @@
 </head>
 <body style="background-color:white;">
 
-    <button id="Button1">Button 1</button>
-    <button id="Button2">Button 2</button>
+    <button id="Godzilla">Godzilla</button>
+    <button id="Soda Bottle">Soda Bottle</button>
 
     <h1 id="header" style="background-color:white;"></h1>
 
@@ -61,6 +81,18 @@
         <input type="text" name="broadcast_data" id="broadcast_data" placeholder="Message">
         <input type="submit" value="Send Broadcast Message">
     </form>
+
+    <form id="username" method="POST" action='#'>
+        <input type="text" name="username_data" id="username_data" placeholder="Username">
+        <input type="submit" value="Username">
+    </form>
+
+    <br>
+
+    <!-- <form id="username" method="POST" action='#'>
+        <input type="text" name="username_data" id="username_data" placeholder="username">
+        <input type="submit" value="Enter Username">
+    </form> -->
 
     <h2 style="background-color:white;">Logs</h2>
     <div id="log" ></div>

@@ -30,6 +30,14 @@ def test_broadcast_message(message):
          {'data': message['data'], 'count': session['receive_count']},
          broadcast=True)
 
+@socket_.on('username_event', namespace='/test')
+def test_username_message(message):
+    session['receive_count'] = session.get('receive_count', 0) + 1
+    session['username'] = message['data']
+    emit('my_response',
+         {'data': message['data'] + " has joined", 'count': session['receive_count']},
+         broadcast=True)
+
 @socket_.on('character_chosen', namespace='/test')
 def character_chosen(id):
     session['character'] = id['data']
