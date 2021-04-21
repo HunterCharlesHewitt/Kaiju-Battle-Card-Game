@@ -56,6 +56,16 @@ def join(message):
     emit('my_response',
          {'data': 'In rooms: ' + ', '.join(rooms()),
           'count': session['receive_count']})
+    emit('join_response_global', 
+            {'username':session['username'], 'sid':message['id']},
+            broadcast=True)
+    emit('join_response_local')
+    if(message['room_size'] > 0):
+        print("______________________")
+        print("room size of at least 1")
+        print("being sent to{}",message['first_id'])
+        emit('alert_first_user',{'first_id':message['first_id']}, broadcast=True)
+
 
 @socket_.on('character_chosen', namespace='/test')
 def character_chosen(id):

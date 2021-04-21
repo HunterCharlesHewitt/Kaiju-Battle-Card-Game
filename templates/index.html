@@ -14,6 +14,30 @@
 
             namespace = '/test';
             var socket = io(namespace);
+            socket.room = []
+
+            socket.on('join_response_global',function(msg,cb) {
+                console.log("join_response")
+                socket.room.push(msg.sid)
+                console.log(socket)
+            
+                if (cb)
+                    cb();
+            })                 
+
+            socket.on('join_response_local',function() {
+                $('.creatureButton').css("visibility","hidden")
+            })
+
+            socket.on('alert_first_user',function(msg,cb) {
+                if(msg.first_id == socket.id)
+                {
+                    console.log(socket.id)
+                    $('#start').css("visibility","visible")
+                }
+                if (cb)
+                    cb();
+            })
 
             socket.on('connect', function() {
                 socket.emit('my_event', {data: 'connected to the SocketServer...'});
@@ -27,6 +51,7 @@
 
             socket.on('character_chosen_local', function(id,cb) {
                 $('#header').html((id.data + " chosen"));
+                $('#join').css("visibility","visible")
                 socket.character = id.data;
                 if (cb)
                     cb();
@@ -47,16 +72,22 @@
 
             $('form#username').submit(function(event) {
                 console.log("here")
-                socket.nickname = $('#username_data').val()
+                socket.username = $('#username_data').val()
                 socket.emit('username_event', {data: $('#username_data').val()});
                 $('#username').html("");
-                $('.creature').css("visibility","visible")
+                $('.creatureButton').css("visibility","visible")
                 return false;
             });
 
             $('form#join').submit(function(event) {
                 console.log("form join")
-                socket.emit('join', {room: $('#join_room').val()});
+                var first_user;
+                if(socket.room.length > 0)
+                {
+                    console.log("room size of at least one")
+                    first_user = socket.room[0]
+                }
+                socket.emit('join', {'room': 'room1','room_size': socket.room.length, 'id': socket.id, 'first_id': first_user});
                 return false;
             });
 
@@ -72,15 +103,15 @@
 </head>
 <body style="background-color:white;">
 
-    <button class="hidden creature" id="Godzilla">Godzilla</button>
-    <button class="hidden creature" id="SodaBottle">Soda Bottle</button>
+    <button class="hidden creatureButton" id="Godzilla">Godzilla</button>
+    <button class="hidden creatureButton" id="SodaBottle">Soda Bottle</button>
 
     <h1 id="header" style="background-color:white;"></h1>
 
-    <!-- <form id="broadcast" method="POST" action='#'>
+    <form id="broadcast" method="POST" action='#'>
         <input type="text" name="broadcast_data" id="broadcast_data" placeholder="Message">
         <input type="submit" value="Send Broadcast Message">
-    </form> -->
+    </form>
 
     <form id="username" method="POST" action='#'>
         <input type="text" name="username_data" id="username_data" placeholder="Username">
@@ -88,11 +119,10 @@
     </form>
 
     <form class="hidden" id="start" method="POST" action='#'>
-        <input type="submit" value="start">
+        <input type="submit" value="Start Battle">
     </form>
 
-    <form id="join" method="POST" action='#'>
-        <input type="text" name="join_room" id="join_room" placeholder="Room Name">
+    <form id="join" class="hidden" method="POST" action='#'>
         <input type="submit" value="Join Room">
     </form>
 
