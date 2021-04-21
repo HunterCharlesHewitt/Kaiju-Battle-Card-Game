@@ -54,6 +54,12 @@
                 return false;
             });
 
+            $('form#join').submit(function(event) {
+                console.log("form join")
+                socket.emit('join', {room: $('#join_room').val()});
+                return false;
+            });
+
             //this defines that all button clicks perform this event
             $('button').click(function(event) {
                 console.log()
@@ -83,6 +89,11 @@
 
     <form class="hidden" id="start" method="POST" action='#'>
         <input type="submit" value="start">
+    </form>
+
+    <form id="join" method="POST" action='#'>
+        <input type="text" name="join_room" id="join_room" placeholder="Room Name">
+        <input type="submit" value="Join Room">
     </form>
 
     <h2 style="background-color:white;">Logs</h2>

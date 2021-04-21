@@ -1,5 +1,5 @@
 from flask import Flask, render_template, session, copy_current_request_context
-from flask_socketio import SocketIO, emit, disconnect
+from flask_socketio import SocketIO, emit, disconnect, join_room, rooms
 from threading import Lock
 
 
@@ -46,6 +46,16 @@ def test_username_message(message):
     emit('my_response',
          {'data': message['data'] + " has joined", 'count': session['receive_count']},
          broadcast=True)
+
+@socket_.on('join', namespace='/test')
+def join(message):
+    print("__________________")
+    print("In Join Function")
+    join_room(message['room'])
+    session['receive_count'] = session.get('receive_count', 0) + 1
+    emit('my_response',
+         {'data': 'In rooms: ' + ', '.join(rooms()),
+          'count': session['receive_count']})
 
 @socket_.on('character_chosen', namespace='/test')
 def character_chosen(id):
