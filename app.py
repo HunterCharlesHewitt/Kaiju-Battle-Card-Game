@@ -22,14 +22,14 @@ def battle(nickname):
     return render_template('battle_menu.html', async_mode=socket_.async_mode)
 
 
-@socket_.on('my_event', namespace='/test')
+@socket_.on('my_event')
 def test_message(message):
     session['receive_count'] = session.get('receive_count', 0) + 1
     emit('my_response',
          {'data': message['data'], 'count': session['receive_count']})
 
 
-@socket_.on('my_broadcast_event', namespace='/test')
+@socket_.on('my_broadcast_event')
 def test_broadcast_message(message):
     print("_____________________________")
     session['receive_count'] = session.get('receive_count', 0) + 1
@@ -37,17 +37,20 @@ def test_broadcast_message(message):
          {'data': message['data'], 'count': session['receive_count']},
          broadcast=True)
 
-@socket_.on('username_event', namespace='/test')
+@socket_.on('username_event')
 def test_username_message(message):
     session['receive_count'] = session.get('receive_count', 0) + 1
-    session['username'] = message['data']
-    user_name = message['data']
+    session['username'] = message['username']
+    user_name = message['username']
     print(user_name)
     emit('my_response',
-         {'data': message['data'] + " has joined", 'count': session['receive_count']},
+         {'data': message['username'] + " has joined", 'count': session['receive_count']},
+         broadcast=True)
+    emit('username_global_response',
+         {'username': message['username'], 'id':message['id'],},
          broadcast=True)
 
-@socket_.on('join', namespace='/test')
+@socket_.on('join')
 def join(message):
     print("__________________")
     print("In Join Function")
@@ -67,15 +70,19 @@ def join(message):
         emit('alert_first_user',{'first_id':message['first_id']}, broadcast=True)
 
 
-@socket_.on('character_chosen', namespace='/test')
+@socket_.on('character_chosen')
 def character_chosen(id):
-    session['character'] = id['data']
+    session['character'] = id['character_id']
     session['receive_count'] = session.get('receive_count', 0) + 1
     emit('character_chosen_local',
-         {'data': id['data'], 'count': session['receive_count']})
+         {'character_id': id['character_id'], 'count': session['receive_count']})
     emit('character_chosen_global',
-         {'data': id['data'], 'count': session['receive_count'],'username':session['username']},
+         {'character_id': id['character_id'], 'user_id': id['user_id'],'count': session['receive_count'],'username':session['username']},
          broadcast=True)
+
+@socket_.on('start_battle')
+def start_battle(message):
+    emit('room_battle_start',room=message['room'])
 
 if __name__ == '__main__':
     socket_.run(app, debug=True)
