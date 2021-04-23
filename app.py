@@ -60,24 +60,26 @@ def join(message):
          {'data': 'In rooms: ' + ', '.join(rooms()),
           'count': session['receive_count']})
     emit('join_response_global', 
-            {'username':session['username'], 'sid':message['id']},
+            {'username':session['username'], 'user_id':message['id']},
             broadcast=True)
     emit('join_response_local')
-    if(message['room_size'] > 0):
-        print("______________________")
-        print("room size of at least 1")
-        print("being sent to{}",message['first_id'])
-        emit('alert_first_user',{'first_id':message['first_id']}, broadcast=True)
+
+@socket_.on('first_ready')
+def first_ready(message):
+    print("______________________")
+    print("room size of at least 1")
+    print("being sent to{}",message['first_id_ready'])
+    emit('alert_first_user',{'first_id':message['first_id_ready']}, broadcast=True)
 
 
 @socket_.on('character_chosen')
-def character_chosen(id):
-    session['character'] = id['character_id']
+def character_chosen(message):
+    session['character'] = message['character_id']
     session['receive_count'] = session.get('receive_count', 0) + 1
     emit('character_chosen_local',
-         {'character_id': id['character_id'], 'count': session['receive_count']})
+         {'character_id': message['character_id'], 'count': session['receive_count']})
     emit('character_chosen_global',
-         {'character_id': id['character_id'], 'user_id': id['user_id'],'count': session['receive_count'],'username':session['username']},
+         {'character_id': message['character_id'], 'user_id': message['user_id'],'count': session['receive_count'],'username':session['username']},
          broadcast=True)
 
 @socket_.on('start_battle')

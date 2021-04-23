@@ -4,10 +4,12 @@
     <title>Socket-Test</title>
     <script src="//code.jquery.com/jquery-1.12.4.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+    <script src="{{url_for('static',filename='js/utils.js')}}"></script>
     <style>
         .hidden{
             visibility: hidden;
         }
+
     </style>
     <script type="text/javascript" charset="utf-8">
         $(document).ready(function() {
@@ -18,32 +20,15 @@
             socket.id_to_username = {};
             socket.id_to_characters = {};
             socket.character_id_to_name = {};
+            socket.current_action_selected;
+            socket.current_creature_selected;
             socket.in_room = false;
 
 
             socket.on('join_response_global',function(msg,cb) {
                 console.log("join_response")
-                socket.room.push(msg.sid)
+                socket.room.push(msg.user_id)
                 console.log(socket)
-                if(socket.in_room) {
-                    $('#usersInRoom').removeClass("hidden")
-                    $('#usersInRoom').html("")
-                    socket.room.forEach(function(item,index) {
-                        console.log(item)
-                        var string = '<li syle="visibility:visible">';
-                        string += socket.id_to_username[item] + ": ";
-                        console.log(socket.id_to_characters[msg.sid])
-                        socket.id_to_characters[item].forEach(function(innerItem,index) {
-                            console.log(innerItem)
-                            string += (innerItem);
-                            if(index !== socket.room.length - 1)
-                                string += ", "
-                        })
-                        console.log(string)
-                        string += '</li>';
-                        $('#usersInRoom').append(string);
-                    });
-                }
                 if (cb)
                     cb();
             })                 
@@ -51,29 +36,34 @@
             socket.on('room_battle_start',function() {
                 console.log("room battle start")
                 console.log("__________________")
-                $('#startBattle').css("visibility","hidden")
-                $('#header').css("visibility","hidden")
-                $('.actionButton').css("visibility","visible")
-                
+                $('#startBattle').hide()
+                $('#header').hide()
+                $('.creatureButton').hide()
+                $('#waiting').hide()
+                $('.battle').show()
                 socket.room.forEach(function(item,index) {
                     socket.id_to_characters[item].forEach(function(innerItem,index) {
-                        $('#userButtons').append('<button>' + innerItem +'</button>')
+                        $('#userButton').append('<button id="' + innerItem + "selectButton" + '" class="creatureSelectButton">' + innerItem +'</button><br>')
                     })
                 })
             });
 
             socket.on('join_response_local',function() {
                 console.log("join response local")
-                $('.creatureButton').css("visibility","hidden")
-                $('#join').css("visibility","hidden")
+                $('.creatureButton').show()
+                $('.creatureButton').colorList()
+                $('#join').hide()
+                $('#waiting').show();
             });
 
             socket.on('alert_first_user',function(msg,cb) {
+                console.log(socket.id)
                 if(msg.first_id == socket.id)
                 {
                     console.log(socket.id)
-                    $('#startBattle').css("visibility","visible")
+                    $('#startBattle').show()
                 }
+                $('#waiting').hide()
                 if (cb)
                     cb();
             });
@@ -95,7 +85,6 @@
 
             socket.on('character_chosen_local', function(msg,cb) {
                 $('#header').html((msg.character_id + " chosen"));
-                $('#join').css("visibility","visible")
                 if (cb)
                     cb();
             })
@@ -107,6 +96,43 @@
                     socket.id_to_characters[msg.user_id] = []
                 socket.id_to_characters[msg.user_id].push(msg.character_id)
                 console.log(socket.id_to_characters)
+
+                var first_user_ready;
+                console.log(Object.keys(socket.id_to_characters).length)
+                console.log(socket.room.length)
+                if(socket.room.length > 0 && socket.id_to_characters && Object.keys(socket.id_to_characters).length > 1)
+                {
+                        console.log("room size of at least one")
+                        first_user_ready = socket.room[0]
+                        console.log(socket.room)
+                        var stringRoom = JSON.stringify(socket.room);
+                        socket.emit('first_ready', {'room': 'room1','room_size': socket.room.length, 'id': socket.id, 'first_id_ready': first_user_ready,'users_in_room':stringRoom});
+                }
+
+                if(socket.in_room) {
+                    $('#usersInRoom').removeClass("hidden")
+                    $('#usersInRoom').html("")
+                    socket.room.forEach(function(item,index) {
+                        if(socket.id_to_characters[item])
+                        {
+                            console.log(socket)
+                            var string = '<li syle="visibility:visible">';
+                            string += socket.id_to_username[item] + ": ";
+                            console.log(socket.id_to_characters[item])
+
+                            socket.id_to_characters[item].forEach(function(innerItem,index) {
+                                console.log(innerItem)
+                                string += (innerItem);
+                                if(index != socket.id_to_characters[item].length - 1)
+                                    string += ", "
+                            })
+                            console.log(string)
+                            string += '</li>';
+                            $('#usersInRoom').append(string);
+                        }
+                    });
+
+                }
                 $('#log').append('<br>' + $('<div/>').text('logs #' + msg.count + ': '+ msg.username + " has chosen " + msg.character_id).html());
                 if (cb)
                     cb();
@@ -122,23 +148,24 @@
                 socket.username = $('#username_data').val()
                 socket.id_to_username[socket.id] = socket.username 
                 socket.emit('username_event', {'username': $('#username_data').val(),'id':socket.id});
-                $('#username').html("");
-                $('.creatureButton').css("visibility","visible")
+                $('#username').hide();
+                $('#join').show();
                 return false;
             });
 
             $('form#join').submit(function(event) {
                 console.log("form join")
                 socket.in_room = true;
-                var first_user;
-                if(socket.room.length > 0)
+                var first_user_ready;
+                roomLength = socket.room ? socket.room.size : 0; 
+                if(roomLength > 0)
                 {
-                    console.log("room size of at least one")
-                    first_user = socket.room[0]
-                    console.log(socket.room)
+                        console.log("room size of at least one")
+                        first_user_ready = socket.room[0]
+                        console.log(socket.room)
                 }
                 var stringRoom = JSON.stringify(socket.room);
-                socket.emit('join', {'room': 'room1','room_size': socket.room.length, 'id': socket.id, 'first_id': first_user,'users_in_room':stringRoom});
+                socket.emit('join', {'room': 'room1','room_size': roomLength, 'id': socket.id, 'first_id': first_user_ready,'users_in_room':stringRoom});
                 return false;
             });
 
@@ -149,14 +176,49 @@
 
             //this defines that all button clicks perform this event
             $('.creatureButton').click(function(event) {
-                socket.characters.push($(this).attr('id'));
+                id_str = $(this).attr('id');
+                socket.characters.push({ id_str : {'health':20,'action':null}});
                 socket.emit('character_chosen', {'character_id': $(this).attr('id'), 'user_id': socket.id});
                 return false;
             });
 
-            $('#attack').click(function(event){
-                socket.emit('attack',{'opponent_character':'_____________________________'})
+            $('#playCards').submit(function(event){
+                //see which action card they have selected for each character
+                //see which character card they have selected for each user
             })
+
+            $('.actionButton').submit(function(event){
+                console.log('action button')
+                socket.current_action_selected = $(this).attr('id');
+                $('.actionButton').first.css('all','unset')
+                $(this).first().css('background-color','blue');
+                if(socket.current_action_selected && socket.current_creature_selected)
+                {
+                    $('#playCards').show();
+                }
+                socket.emit('my_broadcast_event',  {data: "hello"});
+                return false;
+            })
+
+            $('.creatureSelectButton').click(function(event){
+                console.log("creature select")
+                socket.current_creature_selected = $(this).attr('id');
+                $('.creatureSelectButton').css('all','unset');
+                $(this).css('background-color','blue');
+                if(socket.current_action_selected && socket.current_creature_selected)
+                {
+                    $('#playCards').show();
+                }
+                socket.emit('my_broadcast_event', {data: "hello"});
+                return false;
+            })
+
+            $('#SodaBottleselectButton').click(function(event) {
+                id_str = $(this).attr('id');
+                socket.characters.push({ id_str : {'health':20,'action':null}});
+                socket.emit('my_broadcast_event',  {data: "hello"});
+                return false;
+            });
 
 
 
@@ -170,7 +232,8 @@
     <button class="hidden creatureButton" id="Mothera">Mothera</button>
     <button class="hidden creatureButton" id="Gamera">Gamera</button>
 
-    <h1 id="header" style="background-color:white;"></h1>
+    <h1 id="header"></h1>
+    <h1 id="waiting" class="hidden">Waiting for Other Players</h1>
 
     <form id="broadcast" method="POST" action='#'>
         <input type="text" name="broadcast_data" id="broadcast_data" placeholder="Message">
@@ -191,15 +254,31 @@
     </form>
 
     <ol id="usersInRoom" class="hidden"></ol>
+
+    <h2 class="hidden battle">Action Select</h2>
     
-    <button class="hidden actionButton" id="attack">Attack</button>
-    <button class="hidden actionButton" id="defend">Defend</button>
-    <button class="hidden actionButton" id="heal">Heal</button>
-    <button class="hidden actionButton" id="sp">Special Power</button>
+    <form class="hidden actionButton battle" id="attack"> 
+        <input type="submit" value="Attack">
+    </form>
+    <form class="hidden actionButton battle" id="defend">
+        <input type="submit" value="Defend">
+    </form>
+    <form class="hidden actionButton battle" id="heal">
+        <input type="submit" value="Heal">
+    </form>
+    <form class="hidden actionButton battle" id="sp">
+        <input type="submit" value="Special Power">
+    </form>
 
-    <h2 style="background-color:white;">Logs</h2>
+    <h2 class="hidden battle">Creature Select</h2>
 
-    <div id="userButtons"></div>
+    <div id="userButton"></div>
+
+    <form class="hidden" id="playCards">
+        <input type="submit" value="Play Cards">
+    </form>
+
+    <h2 class="hidden battle">Logs</h2>
     
     <div id="log" ></div>
 </body>
