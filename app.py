@@ -1,7 +1,7 @@
 from flask import Flask, render_template, session, copy_current_request_context
 from flask_socketio import SocketIO, emit, disconnect, join_room, rooms
 from threading import Lock
-
+from utils.actions import perform_action
 
 async_mode = None
 app = Flask(__name__)
@@ -16,10 +16,6 @@ character = ''
 @app.route('/')
 def index():
     return render_template('index.html', async_mode=socket_.async_mode)
-
-@app.route('/battle_menu/<nickname>')
-def battle(nickname):
-    return render_template('battle_menu.html', async_mode=socket_.async_mode)
 
 
 @socket_.on('my_event')
@@ -71,6 +67,20 @@ def first_ready(message):
     print("being sent to{}",message['first_id_ready'])
     emit('alert_first_user',{'first_id':message['first_id_ready']}, broadcast=True)
 
+@socket_.on('play_cards')
+def play_cards(message):
+    # message['user_id']
+    # message['character_id']
+    # message['current_creature_selected']
+    # message['current_action_selected']
+    # message['target_user_id']
+    #fixme,add sp and passive
+    user_health_modifier,target_health_modifier,defense_modifier = perform_action(message['current_action_selected'])
+    if(target_health_modifier != 0):
+        emit('action',{'user_health_modifier':target_health_modifier,'acting_user': message['user_id']},room=message['target_user_id'])
+    elif(defense_modifier != 0 or user_health_modifier != 0):
+        emit('action',{'user_health_modifier':user_health_modifier,'defense_modifier':defense_modifier},room=message['user_id'])
+    emit('action_global', broadcast=True)
 
 @socket_.on('character_chosen')
 def character_chosen(message):
@@ -79,7 +89,7 @@ def character_chosen(message):
     emit('character_chosen_local',
          {'character_id': message['character_id'], 'count': session['receive_count']})
     emit('character_chosen_global',
-         {'character_id': message['character_id'], 'user_id': message['user_id'],'count': session['receive_count'],'username':session['username']},
+         {'character_id': message['character_id'], 'user_id': message['user_id'],'count': session['receive_count'],'username':session['username'],'remove_character':message['remove_character']},
          broadcast=True)
 
 @socket_.on('start_battle')

@@ -16,12 +16,21 @@
 
             var socket = io();
             socket.room = [];
-            socket.characters = [];
+            socket.character;
+            socket.removeCharacter = null;
+            socket.hp;
+            socket.round_defense = 0;
+            socket.charge = 0;
+            socket.round_damage = 0;
+            socket.cards_played = 0;
+            socket.first_attacker;
             socket.id_to_username = {};
-            socket.id_to_characters = {};
-            socket.character_id_to_name = {};
+            socket.id_to_character = {};
+            socket.character_to_id = {};
+            socket.character_to_id = {};
             socket.current_action_selected;
             socket.current_creature_selected;
+            socket.current_creature_playing;
             socket.in_room = false;
 
 
@@ -31,7 +40,36 @@
                 console.log(socket)
                 if (cb)
                     cb();
-            })                 
+            })  
+            
+            // msg.user_health_modifier
+            // msg.defense_modifier
+            // msg.acting_user
+            socket.on('action',function(msg){
+                console.log("action from " + socket.id_to_username[msg.acting_user])
+                console.log("health: " + msg.user_health_modifier)
+                console.log("defense: " + msg.defense_modifier)
+
+                if(msg.user_health_modifier > 0) {
+                    socket.hp += msg.user_health_modifier;
+                }
+                else {
+                    socket.round_damage += msg.user_health_modifier;
+                    socket.first_attacker = msg.acting_user;
+                }
+                if(msg.defense_modifier) {
+                    socket.defense += msg.defense_modifier
+                }
+            })
+
+            socket.on('action_global',function(msg){
+                socket.cards_played += 1;
+                if(socket.cards_played == socket.room.length) {
+                    socket.cards_played = 0
+                    console.log("ready for calculations")
+                }
+                //emit calculate stuff
+            })
 
             socket.on('room_battle_start',function() {
                 console.log("room battle start")
@@ -42,9 +80,8 @@
                 $('#waiting').hide()
                 $('.battle').show()
                 socket.room.forEach(function(item,index) {
-                    socket.id_to_characters[item].forEach(function(innerItem,index) {
-                        $('#userButton').append(`<button id="${innerItem + "SelectButton"}" class="creatureSelectButton">${innerItem}</button>`)
-                    })
+                    innerItem = socket.id_to_character[item]
+                    $('#userButton').append(`<button id="${innerItem + "SelectButton"}" class="creatureSelectButton">${innerItem}</button>`)
                 })
             });
 
@@ -92,15 +129,19 @@
             socket.on('character_chosen_global', function(msg,cb) {
                 $('#'+msg.character_id).attr('disabled','disabled');
                 console.log("disabled" + msg.character_id)
-                if(!socket.id_to_characters[msg.user_id])
-                    socket.id_to_characters[msg.user_id] = []
-                socket.id_to_characters[msg.user_id].push(msg.character_id)
-                console.log(socket.id_to_characters)
+
+                socket.character_to_id[msg.character_id] = msg.user_id
+
+                socket.id_to_character[msg.user_id] = (msg.character_id)
+
+                if(msg['remove_character'] != null) {
+                    console.log("here")
+                    $('#'+msg['remove_character']).removeAttr('disabled')
+                }
 
                 var first_user_ready;
-                console.log(Object.keys(socket.id_to_characters).length)
                 console.log(socket.room.length)
-                if(socket.room.length > 0 && socket.id_to_characters && Object.keys(socket.id_to_characters).length > 1)
+                if(socket.room.length > 0 && socket.id_to_character && Object.keys(socket.id_to_character).length > 1)
                 {
                         console.log("room size of at least one")
                         first_user_ready = socket.room[0]
@@ -113,19 +154,14 @@
                     $('#usersInRoom').removeClass("hidden")
                     $('#usersInRoom').html("")
                     socket.room.forEach(function(item,index) {
-                        if(socket.id_to_characters[item])
+                        if(socket.id_to_character[item])
                         {
                             console.log(socket)
                             var string = '<li syle="visibility:visible">';
                             string += socket.id_to_username[item] + ": ";
-                            console.log(socket.id_to_characters[item])
-
-                            socket.id_to_characters[item].forEach(function(innerItem,index) {
-                                console.log(innerItem)
-                                string += (innerItem);
-                                if(index != socket.id_to_characters[item].length - 1)
-                                    string += ", "
-                            })
+                            console.log(socket.id_to_character[item])
+                            innerItem = socket.id_to_character[item]
+                            string += (innerItem + (" (hp: "+socket.hp+") "));
                             console.log(string)
                             string += '</li>';
                             $('#usersInRoom').append(string);
@@ -177,14 +213,28 @@
             //this defines that all button clicks perform this event
             $('.creatureButton').click(function(event) {
                 id_str = $(this).attr('id');
-                socket.characters.push({ id_str : {'health':20,'action':null}});
-                socket.emit('character_chosen', {'character_id': $(this).attr('id'), 'user_id': socket.id});
+                if(socket.character){
+                    socket.removeCharacter = socket.character
+                }
+                socket.character = id_str;
+                
+                //FIXME
+                socket.hp = 20
+                socket.emit('character_chosen', {'character_id': $(this).attr('id'), 'user_id': socket.id, 'remove_character': socket.removeCharacter});
                 return false;
             });
 
             $('#playCards').submit(function(event){
-                //see which action card they have selected for each character
-                //see which character card they have selected for each user
+                $('#userButton .creatureSelectButton').css('background-color','')
+                $('.actionButton').css('background-color','unset')
+                socket.current_creature_playing = socket.id_to_character[socket.id]
+                socket.emit('play_cards',{'user_id':socket.id, 'character_id' : socket.current_creature_playing, 
+                    'target_user_id' : socket.character_to_id[socket.current_creature_selected],
+                    'current_creature_selected':socket.current_creature_selected, 
+                    'current_action_selected':socket.current_action_selected})
+                $('#playCards').hide();
+                $('#waiting').show()
+                return false;
             })
 
             $('.actionButton').click(function(event){
@@ -196,21 +246,19 @@
                 {
                     $('#playCards').show();
                 }
-                socket.emit('my_broadcast_event',  {data: "hello"});
                 return false;
             })
 
             $('#userButton').on('click','.creatureSelectButton',function(event){
                 console.log($(this).attr('id'))
                 console.log("creature select")
-                socket.current_creature_selected = $(this).attr('id');
+                socket.current_creature_selected = $(this).attr('id').replace('SelectButton','');
                 $('#userButton .creatureSelectButton').css('background-color','')
                 $(this).css('background-color','SeaGreen');
                 if(socket.current_action_selected && socket.current_creature_selected)
                 {
                     $('#playCards').show();
                 }
-                socket.emit('my_broadcast_event',  {data: "hello"});
                 return false;
             });
 
@@ -227,11 +275,6 @@
 
     <h1 id="header"></h1>
     <h1 id="waiting" class="hidden">Waiting for Other Players</h1>
-
-    <form id="broadcast" method="POST" action='#'>
-        <input type="text" name="broadcast_data" id="broadcast_data" placeholder="Message">
-        <input type="submit" value="Send Broadcast Message">
-    </form>
 
     <form id="username" method="POST" action='#'>
         <input type="text" name="username_data" id="username_data" placeholder="Username">
@@ -271,7 +314,12 @@
         <input type="submit" value="Play Cards">
     </form>
 
-    <h2 class="hidden battle">Logs</h2>
+    <h2>Logs</h2>
+
+    <form autocomplete="off" id="broadcast" method="POST" action='#'>
+        <input type="text" name="broadcast_data" id="broadcast_data" placeholder="Message">
+        <input type="submit" value="Send Broadcast Message">
+    </form>
     
     <div id="log" ></div>
 </body>
