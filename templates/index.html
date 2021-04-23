@@ -43,7 +43,7 @@
                 $('.battle').show()
                 socket.room.forEach(function(item,index) {
                     socket.id_to_characters[item].forEach(function(innerItem,index) {
-                        $('#userButton').append('<button class="creatureSelectButton">'+innerItem+'</button>')
+                        $('#userButton').append(`<button id="${innerItem + "SelectButton"}" class="creatureSelectButton">${innerItem}</button>`)
                     })
                 })
             });
@@ -187,11 +187,11 @@
                 //see which character card they have selected for each user
             })
 
-            $('.actionButton').submit(function(event){
+            $('.actionButton').click(function(event){
                 console.log('action button')
                 socket.current_action_selected = $(this).attr('id');
-                $('.actionButton').first().css('all','unset')
-                $(this).first().css('background-color','SeaGreen');
+                $('.actionButton').css('background-color','unset')
+                $(this).css('background-color','SeaGreen');
                 if(socket.current_action_selected && socket.current_creature_selected)
                 {
                     $('#playCards').show();
@@ -201,16 +201,15 @@
             })
 
             $('#userButton').on('click','.creatureSelectButton',function(event){
-                console.log($(this))
+                console.log($(this).attr('id'))
                 console.log("creature select")
-                //grab inner html
-                // socket.current_creature_selected = $(this).attr('id');
-                // $('#userButton .creatureSelectButton').first().css('all','unset')
-                // //$(this).first().css('background-color','SeaGreen');
-                // if(socket.current_action_selected && socket.current_creature_selected)
-                // {
-                //     $('#playCards').show();
-                // }
+                socket.current_creature_selected = $(this).attr('id');
+                $('#userButton .creatureSelectButton').css('background-color','')
+                $(this).css('background-color','SeaGreen');
+                if(socket.current_action_selected && socket.current_creature_selected)
+                {
+                    $('#playCards').show();
+                }
                 socket.emit('my_broadcast_event',  {data: "hello"});
                 return false;
             });
@@ -251,22 +250,22 @@
 
     <h2 class="hidden battle">Action Select</h2>
     
-    <form class="hidden actionButton battle" id="attack" method="POST" action='#'> 
-        <input type="submit" value="Attack">
-    </form>
-    <form class="hidden actionButton battle" id="defend" method="POST" action='#'>
-        <input type="submit" value="Defend">
-    </form>
-    <form class="hidden actionButton battle" id="heal" method="POST" action='#'>
-        <input type="submit" value="Heal">
-    </form>
-    <form class="hidden actionButton battle" id="sp" method="POST" action='#'>
-        <input type="submit" value="Special Power">
-    </form>
+    <button class="hidden actionButton battle" id="attack"> 
+        Attack
+    </button>
+    <button class="hidden actionButton battle" id="defend">
+        Defend
+    </button>
+    <button class="hidden actionButton battle" id="heal">
+        Heal
+    </button>
+    <button class="hidden actionButton battle" id="sp">
+        Special Power
+    </button>
 
     <h2 class="hidden battle">Creature Select</h2>
 
-    <div class="creatureButtonDiv" id="userButton"></div>
+    <div class="creatureButtonDiv" id="userButton"></div><br>
 
     <form class="hidden" id="playCards">
         <input type="submit" value="Play Cards">
