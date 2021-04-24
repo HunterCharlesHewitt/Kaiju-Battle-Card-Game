@@ -1,3 +1,16 @@
+choose_character_button = function(event) {
+    id_str = $(this).attr('id');
+    if(socket.character){
+        socket.removeCharacter = socket.character
+    }
+    socket.character = id_str;
+    
+    //FIXME
+    socket.hp = 20
+    socket.emit('character_chosen', {'character_id': $(this).attr('id'), 'user_id': socket.id, 'remove_character': socket.removeCharacter});
+    return false;
+}
+
 character_chosen_local = function(msg,cb) {
     $('#header').html((msg.character_id + " chosen"));
     if (cb)

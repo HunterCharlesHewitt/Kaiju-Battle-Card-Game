@@ -1,5 +1,6 @@
 
-
+//msg.user_id
+//msg.username
 username_global_response = function(msg,cb) {
     socket.id_to_username[msg.user_id] = msg.username
     if (cb)

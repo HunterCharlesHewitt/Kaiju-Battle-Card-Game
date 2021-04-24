@@ -1,5 +1,6 @@
 
-
+//msg.username
+//msg.user_id
 join_response_global = function(msg,cb) {
     console.log("join_response")
     socket.room.push(msg.user_id)
