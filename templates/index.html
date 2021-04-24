@@ -43,7 +43,8 @@
             })  
 
             socket.on('action_notice_response',function(msg,cb) {
-                $('body').append('<br>'+'<p class=hidden actionNotice> logs #' + socket.id_to_username[msg.acting_user_id] + ' performed ' + msg.current_action_selected +' on you </p>');
+                console.log(msg)
+                $('body').append('<br>'+'<p class=hidden actionNotice> logs #' + socket.id_to_username[msg.acting_user_id] + ' performed ' + socket.id_to_username[msg.action_performed] +' on' + msg.target_user_id+ '. Your hp is' + socket.hp + '</p>');
             })
             
             // msg.user_health_modifier
