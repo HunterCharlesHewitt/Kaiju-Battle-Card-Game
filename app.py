@@ -78,9 +78,18 @@ def play_cards(message):
     user_health_modifier,target_health_modifier,defense_modifier = perform_action(message['current_action_selected'])
     if(target_health_modifier != 0):
         emit('action',{'user_health_modifier':target_health_modifier,'acting_user': message['user_id']},room=message['target_user_id'])
-    elif(defense_modifier != 0 or user_health_modifier != 0):
+    elif(defense_modifier != 0 ):
         emit('action',{'user_health_modifier':user_health_modifier,'defense_modifier':defense_modifier},room=message['user_id'])
+    elif(user_health_modifier != 0):
+        emit('action',{'user_health_modifier':target_health_modifier},room=message['user_id'])
     emit('action_global', broadcast=True)
+
+# message['target_user_id']
+# message['acting_user_id']
+@socket_.on('block_damage_event')
+def block_damage_event(message):
+    emit('block_damage_response', {'acting_user_id': message['acting_user_id'], 'target_user_id': message['target_user_id']},room=message['target_user_id'])
+
 
 @socket_.on('character_chosen')
 def character_chosen(message):
@@ -95,6 +104,22 @@ def character_chosen(message):
 @socket_.on('start_battle')
 def start_battle(message):
     emit('room_battle_start',room=message['room'])
+
+@socket_.on('calculate_data_event')
+def calculate_data(message):
+    print("here")
+    emit('calculate_data_response')
+
+
+# message['user_id']
+# message['character_id']
+# message['current_creature_selected']
+# message['current_action_selected']
+# message['target_user_id']
+@socket_.on('action_notice_event')
+def action_notice(message):
+    emit('action_notice_response',{'acting_user_id':message['user_id'],'target_user_id':message['target_user_id'],'action_performed':message['current_action_selected']},room=message['target_user_id'])
+    emit('action_notice_response',{'acting_user_id':message['user_id'],'target_user_id':message['target_user_id'],'action_performed':message['current_action_selected']},room=message['user_id'])
 
 if __name__ == '__main__':
     socket_.run(app, debug=True)

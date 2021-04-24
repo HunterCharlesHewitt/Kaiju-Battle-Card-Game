@@ -41,6 +41,10 @@
                 if (cb)
                     cb();
             })  
+
+            socket.on('action_notice_response',function(msg,cb) {
+                $('body').append('<br>'+'<p class=hidden actionNotice> logs #' + socket.id_to_username[msg.acting_user_id] + ' performed ' + msg.current_action_selected +' on you </p>');
+            })
             
             // msg.user_health_modifier
             // msg.defense_modifier
@@ -50,25 +54,66 @@
                 console.log("health: " + msg.user_health_modifier)
                 console.log("defense: " + msg.defense_modifier)
 
-                if(msg.user_health_modifier > 0) {
+                if(msg.user_health_modifier >= 0) {
+                    console.log("here")
                     socket.hp += msg.user_health_modifier;
                 }
                 else {
+                    console.log("here")
                     socket.round_damage += msg.user_health_modifier;
                     socket.first_attacker = msg.acting_user;
+                    console.log(socket.first_attacker)
                 }
+
                 if(msg.defense_modifier) {
-                    socket.defense += msg.defense_modifier
+                    console.log(msg.defense_modifier)
+                    console.log(socket.round_defense)
+                    socket.round_defense += msg.defense_modifier
                 }
+            })
+
+            //msg.target_user_id
+            //msg.acting_user_id
+            socket.on('block_damage_response',function(msg) {
+                socket.hp -= 1;
+                console.log("You take one damage from" + socket.id_to_username[msg.acting_user_id])
+                console.log(socket.hp)
+            })
+
+            socket.on('calculate_data_response',function(msg){
+                if(socket.first_attacker && socket.round_defense > 0) {
+                    console.log(socket.round_damage)
+                    console.log(socket.round_defense)
+                    socket.hp += (socket.round_damage + socket.round_defense)
+                    console.log("sending block damage")
+                    console.log("first attacker" + socket.first_attacker)
+                    console.log("sent by" + socket.id)
+                    socket.emit('block_damage_event',{'target_user_id': socket.first_attacker, 'acting_user_id':socket.id})
+                }
+                else if(socket.round_damage != 0) {
+                    socket.hp += (socket.round_damage)
+                }
+                $("p").show();
+                socket.current_action_selected = "";
+                socket.current_creature_selected = "";
+                console.log(socket.id)
+                console.log(socket)
+                console.log(socket.hp)
             })
 
             socket.on('action_global',function(msg){
                 socket.cards_played += 1;
                 if(socket.cards_played == socket.room.length) {
                     socket.cards_played = 0
+                    $('#userButton .creatureSelectButton').css('background-color','')
+                    $('#userButton .creatureSelectButton').attr('disabled','disabled')
+                    $('.actionButton').attr('disabled','disabled')
+                    $('.actionButton').css('background-color','unset')
+                    $('#playCards').hide()
                     console.log("ready for calculations")
+                    socket.emit('calculate_data_event',{})
                 }
-                //emit calculate stuff
+                
             })
 
             socket.on('room_battle_start',function() {
@@ -161,7 +206,7 @@
                             string += socket.id_to_username[item] + ": ";
                             console.log(socket.id_to_character[item])
                             innerItem = socket.id_to_character[item]
-                            string += (innerItem + (" (hp: "+socket.hp+") "));
+                            string += (innerItem + (" (hp: <span id=hpSpan"+item+'>'+socket.hp+"</span>) "));
                             console.log(string)
                             string += '</li>';
                             $('#usersInRoom').append(string);
@@ -225,8 +270,6 @@
             });
 
             $('#playCards').submit(function(event){
-                $('#userButton .creatureSelectButton').css('background-color','')
-                $('.actionButton').css('background-color','unset')
                 socket.current_creature_playing = socket.id_to_character[socket.id]
                 socket.emit('play_cards',{'user_id':socket.id, 'character_id' : socket.current_creature_playing, 
                     'target_user_id' : socket.character_to_id[socket.current_creature_selected],
@@ -234,6 +277,10 @@
                     'current_action_selected':socket.current_action_selected})
                 $('#playCards').hide();
                 $('#waiting').show()
+                socket.emit('action_notice_event',{'user_id':socket.id, 'character_id' : socket.current_creature_playing, 
+                    'target_user_id' : socket.character_to_id[socket.current_creature_selected],
+                    'current_creature_selected':socket.current_creature_selected, 
+                    'current_action_selected':socket.current_action_selected})
                 return false;
             })
 
