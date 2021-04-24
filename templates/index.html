@@ -34,6 +34,8 @@
             socket.in_room = false;
 
 
+            //msg.username
+            //msg.user_id
             socket.on('join_response_global',function(msg,cb) {
                 console.log("join_response")
                 socket.room.push(msg.user_id)
@@ -42,6 +44,10 @@
                     cb();
             })  
 
+
+            //msg.acting_user_id
+            //msg.target_user_id
+            //msg.action_performed
             socket.on('action_notice_response',function(msg,cb) {
                 console.log(msg)
                 $('body').append('<br>'+'<p class=hidden actionNotice> logs #' + socket.id_to_username[msg.acting_user_id] + ' performed ' + socket.id_to_username[msg.action_performed] +' on' + msg.target_user_id+ '. Your hp is' + socket.hp + '</p>');
@@ -50,7 +56,7 @@
             // msg.user_health_modifier
             // msg.defense_modifier
             // msg.acting_user
-            socket.on('action',function(msg){
+            socket.on('action_response',function(msg){
                 console.log("action from " + socket.id_to_username[msg.acting_user])
                 console.log("health: " + msg.user_health_modifier)
                 console.log("defense: " + msg.defense_modifier)
@@ -81,7 +87,7 @@
                 console.log(socket.hp)
             })
 
-            socket.on('calculate_data_response',function(msg){
+            socket.on('calculate_data_response',function(){
                 if(socket.first_attacker && socket.round_defense > 0) {
                     console.log(socket.round_damage)
                     console.log(socket.round_defense)
@@ -102,7 +108,7 @@
                 console.log(socket.hp)
             })
 
-            socket.on('action_global',function(msg){
+            socket.on('action_global_response',function(msg){
                 socket.cards_played += 1;
                 if(socket.cards_played == socket.room.length) {
                     socket.cards_played = 0
@@ -117,7 +123,7 @@
                 
             })
 
-            socket.on('room_battle_start',function() {
+            socket.on('room_battle_start_response',function() {
                 console.log("room battle start")
                 console.log("__________________")
                 $('#startBattle').hide()

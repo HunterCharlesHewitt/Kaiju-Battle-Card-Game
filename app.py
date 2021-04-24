@@ -79,12 +79,12 @@ def play_cards(message):
     #fixme,add sp and passive
     user_health_modifier,target_health_modifier,defense_modifier = perform_action(message['current_action_selected'])
     if(target_health_modifier != 0):
-        emit('action',{'user_health_modifier':target_health_modifier,'acting_user': message['user_id']},room=message['target_user_id'])
+        emit('action_response',{'user_health_modifier':target_health_modifier,'acting_user': message['user_id']},room=message['target_user_id'])
     elif(defense_modifier != 0 ):
-        emit('action',{'user_health_modifier':user_health_modifier,'defense_modifier':defense_modifier},room=message['user_id'])
+        emit('action_response',{'user_health_modifier':user_health_modifier,'defense_modifier':defense_modifier},room=message['user_id'])
     elif(user_health_modifier != 0):
-        emit('action',{'user_health_modifier':target_health_modifier},room=message['user_id'])
-    emit('action_global', broadcast=True)
+        emit('action_response',{'user_health_modifier':target_health_modifier},room=message['user_id'])
+    emit('action_global_response', broadcast=True)
 
 # message['target_user_id']
 # message['acting_user_id']
@@ -105,7 +105,7 @@ def character_chosen(message):
 
 @socket.on('start_battle')
 def start_battle(message):
-    emit('room_battle_start',room=message['room'])
+    emit('room_battle_start_response',room=message['room'])
 
 @socket.on('calculate_data_event')
 def calculate_data(message):
