@@ -6,23 +6,23 @@ from utils.actions import perform_action
 async_mode = None
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
-socket_ = SocketIO(app, async_mode=async_mode)
+socket = SocketIO(app, async_mode=async_mode)
 thread = None
 thread_lock = Lock()
 
 @app.route('/')
 def index():
-    return render_template('index.html', async_mode=socket_.async_mode)
+    return render_template('index.html', async_mode=socket.async_mode)
 
 #message['data']
-@socket_.on('log_message_event')
+@socket.on('log_message_event')
 def log_message(message):
     session['receive_count'] = session.get('receive_count', 0) + 1
     emit('log_message_response',
          {'data': message['data'], 'count': session['receive_count']})
 
 #message['data']
-@socket_.on('broadcast_event')
+@socket.on('broadcast_event')
 def log_broadcast_message(message):
     session['receive_count'] = session.get('receive_count', 0) + 1
     emit('log_message_response',
@@ -30,7 +30,8 @@ def log_broadcast_message(message):
          broadcast=True)
 
 #message['username']
-@socket_.on('username_event')
+#message['user_id']
+@socket.on('username_event')
 def test_username_message(message):
     session['receive_count'] = session.get('receive_count', 0) + 1
     session['username'] = message['username']
@@ -46,7 +47,7 @@ def test_username_message(message):
 #message['user_id']
 #message['first_user_id']
 #message['users_in_room']
-@socket_.on('join')
+@socket.on('join')
 def join(message):
     print("__________________")
     print("In Join Function")
@@ -60,7 +61,7 @@ def join(message):
             broadcast=True)
     emit('join_response_local')
 
-@socket_.on('first_ready')
+@socket.on('first_ready')
 def first_ready(message):
     print("______________________")
     print("room size of at least 1")
@@ -73,7 +74,7 @@ def first_ready(message):
 # message['current_creature_selected']
 # message['current_action_selected']
 # message['target_user_id']
-@socket_.on('play_cards')
+@socket.on('play_cards')
 def play_cards(message):
     #fixme,add sp and passive
     user_health_modifier,target_health_modifier,defense_modifier = perform_action(message['current_action_selected'])
@@ -87,12 +88,12 @@ def play_cards(message):
 
 # message['target_user_id']
 # message['acting_user_id']
-@socket_.on('block_damage_event')
+@socket.on('block_damage_event')
 def block_damage_event(message):
     emit('block_damage_response', {'acting_user_id': message['acting_user_id'], 'target_user_id': message['target_user_id']},room=message['target_user_id'])
 
 
-@socket_.on('character_chosen')
+@socket.on('character_chosen')
 def character_chosen(message):
     session['character'] = message['character_id']
     session['receive_count'] = session.get('receive_count', 0) + 1
@@ -102,11 +103,11 @@ def character_chosen(message):
          {'character_id': message['character_id'], 'user_id': message['user_id'],'count': session['receive_count'],'username':session['username'],'remove_character':message['remove_character']},
          broadcast=True)
 
-@socket_.on('start_battle')
+@socket.on('start_battle')
 def start_battle(message):
     emit('room_battle_start',room=message['room'])
 
-@socket_.on('calculate_data_event')
+@socket.on('calculate_data_event')
 def calculate_data(message):
     print("here")
     emit('calculate_data_response')
@@ -117,10 +118,10 @@ def calculate_data(message):
 # message['current_creature_selected']
 # message['current_action_selected']
 # message['target_user_id']
-@socket_.on('action_notice_event')
+@socket.on('action_notice_event')
 def action_notice(message):
     emit('action_notice_response',{'acting_user_id':message['user_id'],'target_user_id':message['target_user_id'],'action_performed':message['current_action_selected']},room=message['target_user_id'])
     emit('action_notice_response',{'acting_user_id':message['user_id'],'target_user_id':message['target_user_id'],'action_performed':message['current_action_selected']},room=message['user_id'])
 
 if __name__ == '__main__':
-    socket_.run(app, debug=True)
+    socket.run(app, debug=True)
