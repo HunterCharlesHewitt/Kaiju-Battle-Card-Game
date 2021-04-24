@@ -152,18 +152,19 @@
             });
 
             socket.on('connect', function() {
-                socket.emit('my_event', {data: 'connected to the SocketServer...'});
+                socket.emit('log_message_event', {data: 'connected to the SocketServer...'});
             });
 
-            socket.on('my_response', function(msg, cb) {
+            socket.on('log_message_response', function(msg, cb) {
                 $('#log').append('<br>' + $('<div/>').text('logs #' + msg.count + ': ' + msg.data).html());
                 if (cb)
                     cb();
             });
 
-
+            //msg.user_id
+            //msg.username
             socket.on('username_global_response',function(msg,cb) {
-                socket.id_to_username[msg.id] = msg.username
+                socket.id_to_username[msg.user_id] = msg.username
             })
 
             socket.on('character_chosen_local', function(msg,cb) {
@@ -221,7 +222,7 @@
             })
 
             $('form#broadcast').submit(function(event) {
-                socket.emit('my_broadcast_event', {data: $('#broadcast_data').val()});
+                socket.emit('broadcast_event', {data: $('#broadcast_data').val()});
                 return false;
             });
 
@@ -247,7 +248,7 @@
                         console.log(socket.room)
                 }
                 var stringRoom = JSON.stringify(socket.room);
-                socket.emit('join', {'room': 'room1','room_size': roomLength, 'id': socket.id, 'first_id': first_user_ready,'users_in_room':stringRoom});
+                socket.emit('join', {'room': 'room1','room_size': roomLength, 'user_id': socket.id, 'first_user_id': first_user_ready,'users_in_room':stringRoom});
                 return false;
             });
 

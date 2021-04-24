@@ -9,54 +9,54 @@ app.config['SECRET_KEY'] = 'secret!'
 socket_ = SocketIO(app, async_mode=async_mode)
 thread = None
 thread_lock = Lock()
-user_name = ''
-character = ''
-
 
 @app.route('/')
 def index():
     return render_template('index.html', async_mode=socket_.async_mode)
 
-
-@socket_.on('my_event')
-def test_message(message):
+#message['data']
+@socket_.on('log_message_event')
+def log_message(message):
     session['receive_count'] = session.get('receive_count', 0) + 1
-    emit('my_response',
+    emit('log_message_response',
          {'data': message['data'], 'count': session['receive_count']})
 
-
-@socket_.on('my_broadcast_event')
-def test_broadcast_message(message):
-    print("_____________________________")
+#message['data']
+@socket_.on('broadcast_event')
+def log_broadcast_message(message):
     session['receive_count'] = session.get('receive_count', 0) + 1
-    emit('my_response',
+    emit('log_message_response',
          {'data': message['data'], 'count': session['receive_count']},
          broadcast=True)
 
+#message['username']
 @socket_.on('username_event')
 def test_username_message(message):
     session['receive_count'] = session.get('receive_count', 0) + 1
     session['username'] = message['username']
-    user_name = message['username']
-    print(user_name)
-    emit('my_response',
+    emit('log_message_response',
          {'data': message['username'] + " has joined", 'count': session['receive_count']},
          broadcast=True)
     emit('username_global_response',
-         {'username': message['username'], 'id':message['id'],},
+         {'username': message['username'], 'user_id':message['user_id'],},
          broadcast=True)
 
+#message['room']
+#message['room_size']
+#message['user_id']
+#message['first_user_id']
+#message['users_in_room']
 @socket_.on('join')
 def join(message):
     print("__________________")
     print("In Join Function")
     join_room(message['room'])
     session['receive_count'] = session.get('receive_count', 0) + 1
-    emit('my_response',
+    emit('log_message_response',
          {'data': 'In rooms: ' + ', '.join(rooms()),
           'count': session['receive_count']})
     emit('join_response_global', 
-            {'username':session['username'], 'user_id':message['id']},
+            {'username':session['username'], 'user_id':message['user_id']},
             broadcast=True)
     emit('join_response_local')
 
@@ -67,13 +67,14 @@ def first_ready(message):
     print("being sent to{}",message['first_id_ready'])
     emit('alert_first_user',{'first_id':message['first_id_ready']}, broadcast=True)
 
+
+# message['user_id']
+# message['character_id']
+# message['current_creature_selected']
+# message['current_action_selected']
+# message['target_user_id']
 @socket_.on('play_cards')
 def play_cards(message):
-    # message['user_id']
-    # message['character_id']
-    # message['current_creature_selected']
-    # message['current_action_selected']
-    # message['target_user_id']
     #fixme,add sp and passive
     user_health_modifier,target_health_modifier,defense_modifier = perform_action(message['current_action_selected'])
     if(target_health_modifier != 0):
