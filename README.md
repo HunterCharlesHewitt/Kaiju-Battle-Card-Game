@@ -1,4 +1,5 @@
-# Kaiju-Battle-Card-Game
+# Kaiju-Battle-Card-Game 
+-This application is intended to be a virtual version of the Kaiju Battle Card Game created by Michael Eriksen in April 2021
 
 ## Developer Zone
 
