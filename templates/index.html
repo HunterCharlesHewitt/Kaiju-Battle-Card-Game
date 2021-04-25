@@ -1,7 +1,9 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html>
-<head>
+  <head>
     <title>Socket-Test</title>
+
+    <!--Js Files-->
     <script src="//code.jquery.com/jquery-1.12.4.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
     <script src="{{url_for('static',filename='js/utils.js')}}"></script>
@@ -11,16 +13,28 @@
     <script src="{{url_for('static',filename='js/choose_username.js')}}"></script>
     <script src="{{url_for('static',filename='js/action.js')}}"></script>
     <script src="{{url_for('static',filename='js/start_battle.js')}}"></script>
-    <style>
-        .hidden{
-            visibility: hidden;
-        }
+    <script src="{{url_for('static',filename='js/connect.js')}}"></script>
 
-    </style>
-</head>
-<body style="background-color:white;">
+    <!--Css Files-->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+    <link
+        rel="stylesheet"
+        href="{{url_for('static',filename='css/card.css')}}"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{url_for('static',filename='css/main.css')}}"
+    />
+  </head>
 
-    <button class="hidden creatureButton" id="Godzilla">Godzilla</button>
+  <body>
+    <button class="hidden creatureButton fantasySubmit" id="Godzilla">
+      Godzilla
+    </button>
     <button class="hidden creatureButton" id="SodaBottle">Soda Bottle</button>
     <button class="hidden creatureButton" id="Mothera">Mothera</button>
     <button class="hidden creatureButton" id="Gamera">Gamera</button>
@@ -28,51 +42,60 @@
     <h1 id="header"></h1>
     <h1 id="waiting" class="hidden">Waiting for Other Players</h1>
 
-    <form id="username" method="POST" action='#'>
-        <input type="text" name="username_data" id="username_data" placeholder="Username">
-        <input type="submit" value="Username">
+    <form class="fantasySubmit" id="username" method="POST" action="#">
+      <input
+        class="fantasyTextBox"
+        type="text"
+        name="username_data"
+        id="username_data"
+        placeholder="Username"
+      />
+      <input class="fantasyButton" type="submit" value="Submit" />
     </form>
 
-    <form id="startBattle" class="hidden" method="POST" action='#'>
-        <input type="submit" value="Start Battle">
+    <form id="startBattle" class="hidden" method="POST" action="#">
+      <input class="fantasySubmit" type="submit" value="Start Battle" />
     </form>
 
-    <form id="join" class="hidden" method="POST" action='#'>
-        <input type="submit" value="Join Room">
+    <form id="join" class="hidden" method="POST" action="#">
+      <input class="fantasySubmit" type="submit" value="Join Room" />
     </form>
 
     <ol id="usersInRoom" class="hidden"></ol>
 
     <h2 class="hidden battle">Action Select</h2>
-    
-    <button class="hidden actionButton battle" id="attack"> 
-        Attack
-    </button>
-    <button class="hidden actionButton battle" id="defend">
-        Defend
-    </button>
-    <button class="hidden actionButton battle" id="heal">
-        Heal
-    </button>
-    <button class="hidden actionButton battle" id="sp">
-        Special Power
-    </button>
+
+    <button class="hidden actionButton battle" id="attack">Attack</button>
+    <button class="hidden actionButton battle" id="defend">Defend</button>
+    <button class="hidden actionButton battle" id="heal">Heal</button>
+    <button class="hidden actionButton battle" id="sp">Special Power</button>
 
     <h2 class="hidden battle">Creature Select</h2>
 
-    <div class="creatureButtonDiv" id="userButton"></div><br>
+    <div class="creatureButtonDiv" id="userButton"></div>
+    <br />
 
     <form class="hidden" id="playCards">
-        <input type="submit" value="Play Cards">
+      <input type="submit" value="Play Cards" />
     </form>
 
     <h2>Logs</h2>
 
-    <form autocomplete="off" id="broadcast" method="POST" action='#'>
-        <input type="text" name="broadcast_data" id="broadcast_data" placeholder="Message">
-        <input type="submit" value="Send Broadcast Message">
+    <form autocomplete="off" id="broadcast" method="POST" action="#">
+      <input
+        type="text"
+        name="broadcast_data"
+        id="broadcast_data"
+        placeholder="Message"
+      />
+      <input type="submit" value="Send Broadcast Message" />
     </form>
+
+    <div id="log"></div>
     
-    <div id="log" ></div>
-</body>
+    <div class="card">
+        {% include 'card.html' %}
+    </div>
+
+  </body>
 </html>

@@ -54,6 +54,6 @@ $(document).ready(function() {
     socket.on('action_response',action_response)
     socket.on('action_notice_response',action_notice_response)
     socket.on('action_global_response',action_global_response)
-    socket.on('calculate_data_response',calculcate_data_response)
+    socket.on('calculate_data_response',calculate_data_response)
     socket.on('block_damage_response',block_damage_response)
 });
