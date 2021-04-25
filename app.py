@@ -19,7 +19,18 @@ def index():
             'Beholder':url_for('static',filename='images/creatures/Beholder.PNG'),
             'Boomhauer':url_for('static',filename='images/creatures/Boomhauer.PNG'),
             'SodaBottle':url_for('static',filename='images/creatures/SodaBottle.PNG'),
-            'Donut':url_for('static',filename='images/creatures/Donut.PNG')
+            'Donut':url_for('static',filename='images/creatures/Donut.PNG'),
+            'Mothra':url_for('static',filename='images/creatures/Mothra.PNG'),
+            'Gamera':url_for('static',filename='images/creatures/Gamera.PNG'),
+            'Gamora':url_for('static',filename='images/creatures/Gamora.PNG'),
+            'Jaeger':url_for('static',filename='images/creatures/Jaeger.PNG'),
+            'KingKong':url_for('static',filename='images/creatures/KingKong.PNG'),
+            'Ghedora':url_for('static',filename='images/creatures/Ghedora.PNG'),
+            'Rogue':url_for('static',filename='images/creatures/Rogue.PNG'),
+            'Wizard':url_for('static',filename='images/creatures/Wizard.PNG'),
+            'Zombie':url_for('static',filename='images/creatures/Zombie.PNG'),
+            'MechaGodzilla':url_for('static',filename='images/creatures/MechaGodzilla.PNG'),
+            'Godzilla':url_for('static',filename='images/creatures/Godzilla.PNG'),
         }
     )
 
