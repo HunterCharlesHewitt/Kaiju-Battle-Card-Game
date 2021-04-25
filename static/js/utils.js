@@ -6,6 +6,10 @@ jQuery.fn.show = function() {
     return this.css('visibility', 'visible');
 };
 
+jQuery.fn.id = function() {
+    return this.attr('id');
+};
+
 jQuery.fn.invisible = function() {
     return this.css('visibility', 'hidden');
 };
@@ -20,10 +24,12 @@ jQuery.fn.hide = function() {
 
 jQuery.fn.colorList = function() {
     this.each(function(index,value) {
-        console.log(CSS_COLOR_NAMES[index]);
         $(value).css('background-color', CSS_COLOR_NAMES[index]);
     })
 }
+
+
+
 
 const CSS_COLOR_NAMES = [
     "AliceBlue",

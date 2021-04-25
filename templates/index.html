@@ -1,101 +1,131 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Socket-Test</title>
 
-    <!--Js Files-->
-    <script src="//code.jquery.com/jquery-1.12.4.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
-    <script src="{{url_for('static',filename='js/utils.js')}}"></script>
-    <script src="{{url_for('static',filename='js/main.js')}}"></script>
-    <script src="{{url_for('static',filename='js/join_room.js')}}"></script>
-    <script src="{{url_for('static',filename='js/choose_character.js')}}"></script>
-    <script src="{{url_for('static',filename='js/choose_username.js')}}"></script>
-    <script src="{{url_for('static',filename='js/action.js')}}"></script>
-    <script src="{{url_for('static',filename='js/start_battle.js')}}"></script>
-    <script src="{{url_for('static',filename='js/connect.js')}}"></script>
+<head>
+  <title>Socket-Test</title>
 
-    <!--Css Files-->
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
-    />
-    <link
-        rel="stylesheet"
-        href="{{url_for('static',filename='css/card.css')}}"
-    />
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="{{url_for('static',filename='css/main.css')}}"
-    />
-  </head>
+  <!--Js Files-->
+  <script src="//code.jquery.com/jquery-1.12.4.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+  <script src="{{url_for('static',filename='js/utils.js')}}"></script>
+  <script src="{{url_for('static',filename='js/main.js')}}"></script>
+  <script src="{{url_for('static',filename='js/join_room.js')}}"></script>
+  <script src="{{url_for('static',filename='js/choose_character.js')}}"></script>
+  <script src="{{url_for('static',filename='js/choose_username.js')}}"></script>
+  <script src="{{url_for('static',filename='js/action.js')}}"></script>
+  <script src="{{url_for('static',filename='js/start_battle.js')}}"></script>
+  <script src="{{url_for('static',filename='js/connect.js')}}"></script>
+  <script src="{{url_for('static',filename='js/characters/descriptions.js')}}"></script>
 
-  <body>
-    <button class="hidden creatureButton fantasySubmit" id="Godzilla">
-      Godzilla
-    </button>
-    <button class="hidden creatureButton" id="SodaBottle">Soda Bottle</button>
-    <button class="hidden creatureButton" id="Mothera">Mothera</button>
-    <button class="hidden creatureButton" id="Gamera">Gamera</button>
+  <script>
+    $(document).ready(function(){
+      init_filenames(JSON.parse('{{filenames | tojson | safe}}'))
+    })
+  </script>
 
-    <h1 id="header"></h1>
-    <h1 id="waiting" class="hidden">Waiting for Other Players</h1>
+  <!--Css Files-->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+  <link rel="stylesheet" href="{{url_for('static',filename='css/card.css')}}" />
+  <link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/main.css')}}" />
+</head>
 
-    <form class="fantasySubmit" id="username" method="POST" action="#">
-      <input
-        class="fantasyTextBox"
-        type="text"
-        name="username_data"
-        id="username_data"
-        placeholder="Username"
-      />
-      <input class="fantasyButton" type="submit" value="Submit" />
-    </form>
+<body>
+  <button class="hidden creatureButton fantasySubmit" id="Godzilla">
+    Godzilla
+  </button>
+  <button class="hidden creatureButton fantasySubmit" id="SodaBottle">
+    Soda Bottle
+  </button>
+  <button class="hidden creatureButton fantasySubmit" id="Mothera">
+    Mothera
+  </button>
+  <button class="hidden creatureButton fantasySubmit" id="Gamera">
+    Gamera
+  </button>
+  <button class="hidden creatureButton fantasySubmit" id="Beholder">
+    Beholder
+  </button>
+  <button class="hidden creatureButton fantasySubmit" id="Boomhauer">
+    Boomhauer
+  </button>
+  <button class="hidden creatureButton fantasySubmit" id="Donut">
+    Donut
+  </button>
+  <button class="hidden creatureButton fantasySubmit" id="Gamera">
+    Gamora
+  </button>
+  <button class="hidden creatureButton fantasySubmit" id="Jaeger">
+    Jaeger
+  </button>
+  <button class="hidden creatureButton fantasySubmit" id="KingKong">
+    King Kong
+  </button>
+  <button class="hidden creatureButton fantasySubmit" id="Ghedora">
+    Ghedora
+  </button>
+  <button class="hidden creatureButton fantasySubmit" id="Mothera">
+    Mothera
+  </button>
+  <button class="hidden creatureButton fantasySubmit" id="Rogue">
+    Rogue
+  </button>
+  <button class="hidden creatureButton fantasySubmit" id="Wizard">
+    Wizard
+  </button>
+  <button class="hidden creatureButton fantasySubmit" id="Zombie">
+    Zombie
+  </button>
+  <button class="hidden creatureButton fantasySubmit" id="MechaGodzilla">
+    Mecha Godzilla
+  </button>
+  <button class="hidden creatureButton fantasySubmit" id="Bard">
+    Bard
+  </button>
 
-    <form id="startBattle" class="hidden" method="POST" action="#">
-      <input class="fantasySubmit" type="submit" value="Start Battle" />
-    </form>
+  <h1 id="header"></h1>
+  <h1 id="waiting" class="hidden">Waiting for Other Players</h1>
 
-    <form id="join" class="hidden" method="POST" action="#">
-      <input class="fantasySubmit" type="submit" value="Join Room" />
-    </form>
+  <form class="fantasySubmit" id="username" method="POST" action="#">
+    <input class="fantasyTextBox" type="text" name="username_data" id="username_data" placeholder="Username" />
+    <input class="fantasyButton" type="submit" value="Submit" />
+  </form>
 
-    <ol id="usersInRoom" class="hidden"></ol>
+  <form id="startBattle" class="hidden" method="POST" action="#">
+    <input class="fantasySubmit" type="submit" value="Start Battle" />
+  </form>
 
-    <h2 class="hidden battle">Action Select</h2>
+  <form id="join" class="hidden" method="POST" action="#">
+    <input class="fantasySubmit" type="submit" value="Join Room" />
+  </form>
 
-    <button class="hidden actionButton battle" id="attack">Attack</button>
-    <button class="hidden actionButton battle" id="defend">Defend</button>
-    <button class="hidden actionButton battle" id="heal">Heal</button>
-    <button class="hidden actionButton battle" id="sp">Special Power</button>
+  <ol id="usersInRoom" class="hidden"></ol>
 
-    <h2 class="hidden battle">Creature Select</h2>
+  <h2 class="hidden battle">Action Select</h2>
 
-    <div class="creatureButtonDiv" id="userButton"></div>
-    <br />
+  <button class="hidden actionButton battle" id="attack">Attack</button>
+  <button class="hidden actionButton battle" id="defend">Defend</button>
+  <button class="hidden actionButton battle" id="heal">Heal</button>
+  <button class="hidden actionButton battle" id="sp">Special Power</button>
 
-    <form class="hidden" id="playCards">
-      <input type="submit" value="Play Cards" />
-    </form>
+  <h2 class="hidden battle">Creature Select</h2>
 
-    <h2>Logs</h2>
+  <div class="creatureButtonDiv" id="userButton"></div>
+  <br />
 
-    <form autocomplete="off" id="broadcast" method="POST" action="#">
-      <input
-        type="text"
-        name="broadcast_data"
-        id="broadcast_data"
-        placeholder="Message"
-      />
-      <input type="submit" value="Send Broadcast Message" />
-    </form>
+  <form class="hidden" id="playCards">
+    <input type="submit" value="Play Cards" />
+  </form>
 
-    <div id="log"></div>
-    
-    <div class="card">
-        {% include 'card.html' %}
-    </div>
+  <h2>Logs</h2>
 
-  </body>
+  <form autocomplete="off" id="broadcast" method="POST" action="#">
+    <input type="text" name="broadcast_data" id="broadcast_data" placeholder="Message" />
+    <input type="submit" value="Send Broadcast Message" />
+  </form>
+
+  <div id="log"></div>
+
+  <div id="centerCardDiv" style="top:15%;left:30%;position:absolute" class="card hidden">{% include 'card.html' %}</div>
+</body>
+
 </html>

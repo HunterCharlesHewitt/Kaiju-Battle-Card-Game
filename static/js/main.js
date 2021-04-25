@@ -4,6 +4,8 @@ var socket = io();
 
 $(document).ready(function() {
 
+    $('.creatureButton').hover(creature_hover_enter, creature_hover_exit);
+    
     socket.room = [];
     socket.character;
     socket.removeCharacter = null;

@@ -1,7 +1,8 @@
-from flask import Flask, render_template, session, copy_current_request_context
+from flask import Flask, render_template, session, copy_current_request_context, url_for
 from flask_socketio import SocketIO, emit, disconnect, join_room, rooms
 from threading import Lock
 from utils.actions import perform_action
+import json
 
 async_mode = None
 app = Flask(__name__)
@@ -12,7 +13,15 @@ thread_lock = Lock()
 
 @app.route('/')
 def index():
-    return render_template('index.html', async_mode=socket.async_mode)
+    return render_template('index.html', async_mode=socket.async_mode, filenames=
+        {
+            'Bard':url_for('static',filename='images/creatures/Bard.PNG'),
+            'Beholder':url_for('static',filename='images/creatures/Beholder.PNG'),
+            'Boomhauer':url_for('static',filename='images/creatures/Boomhauer.PNG'),
+            'SodaBottle':url_for('static',filename='images/creatures/SodaBottle.PNG'),
+            'Donut':url_for('static',filename='images/creatures/Donut.PNG')
+        }
+    )
 
 #message['data']
 @socket.on('log_message_event')
