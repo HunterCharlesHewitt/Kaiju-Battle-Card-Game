@@ -15,6 +15,9 @@ $(document).ready(function() {
     socket.cards_played = 0;
     socket.global_round_actions = [];
 
+    //global character information
+    socket.soda_bottle_fizz_points = 0;
+
     //local information
     socket.character;
     socket.removeCharacter = null;

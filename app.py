@@ -91,12 +91,18 @@ def first_ready(message):
 # message['target_user_id']
 @socket.on('play_cards')
 def play_cards(message):
-    #fixme,add sp and passive
-    emit_list = perform_action(message['current_action_selected'],message['character_id'],message['target_user_id'],message['user_id'])
 
-    for lst in emit_list:
-        emit(lst[0],lst[1],room=lst[2])
-        
+    action_emit_list = perform_action(message['current_action_selected'],message['character_id'],message['target_user_id'],message['user_id'],session)
+    
+    #FIXME probably a good idea to wait to perform passives until after initial cards are played
+    passive_emit_list = perform_passive(message['current_action_selected'],message['character_id'],message['target_user_id'],message['user_id'],session)
+
+    for lst in action_emit_list:
+        if(lst[2] == "broadcast")
+            emit(lst[0],lst[1],broadcast=True)
+        else:
+            emit(lst[0],lst[1],room=lst[2])
+
     emit('action_global_response', broadcast=True)
 
 # message['target_user_id']
@@ -109,6 +115,8 @@ def block_damage_event(message):
 @socket.on('character_chosen')
 def character_chosen(message):
     session['character'] = message['character_id']
+    if(session['character'] == 'SodaBottle'):
+        session['fizz_points'] = 0
     session['receive_count'] = session.get('receive_count', 0) + 1
     emit('character_chosen_local',
          {'character_id': message['character_id'], 'count': session['receive_count']})
@@ -128,6 +136,7 @@ def calculate_data(message):
 # message['hp']
 @socket.on('hp_event')
 def hp_event(message):
+    session['hp'] = message['hp']
     emit('hp_response',{'user_id':message['user_id'],'hp':message['hp']}, broadcast=True)
 
 # message['user_id']
