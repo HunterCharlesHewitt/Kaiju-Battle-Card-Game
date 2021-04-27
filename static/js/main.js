@@ -17,6 +17,7 @@ $(document).ready(function() {
     socket.first_attacker;
     socket.id_to_username = {};
     socket.id_to_character = {};
+    socket.id_to_hp = {};
     socket.character_to_id = {};
     socket.character_to_id = {};
     socket.current_action_selected;
@@ -58,4 +59,5 @@ $(document).ready(function() {
     socket.on('action_global_response',action_global_response)
     socket.on('calculate_data_response',calculate_data_response)
     socket.on('block_damage_response',block_damage_response)
+    socket.on('hp_response',hp_response)
 });

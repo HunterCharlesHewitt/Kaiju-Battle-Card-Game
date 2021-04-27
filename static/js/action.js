@@ -44,7 +44,9 @@ choose_target = function(event){
 //msg.action_performed
 action_notice_response = function(msg,cb) {
     console.log(msg)
-    socket.emit('log_message_event', {data : socket.id_to_username[msg.acting_user_id] + ' performed ' + socket.id_to_username[msg.action_performed] +' on' + msg.target_user_id+ '. Your hp is' + socket.hp});
+    socket.emit('log_message_event', {data : socket.id_to_character[msg.acting_user_id] + ' performed ' +  msg.action_performed + ' on ' + socket.id_to_character[msg.target_user_id] + '.'});
+    if (cb)
+        cb();
 }
 
 // msg.user_health_modifier
@@ -77,8 +79,8 @@ action_response = function(msg){
 //msg.acting_user_id
 block_damage_response = function(msg) {
     socket.hp -= 1;
-    console.log("You take one damage from" + socket.id_to_username[msg.acting_user_id])
-    console.log(socket.hp)
+    socket.emit('log_message_event', {data : "You take one block damage from " + socket.id_to_character[msg.acting_user_id]});
+    socket.emit('log_message_event', {data : 'Your HP is ' + socket.hp});
 }
 
 calculate_data_response = function(){
@@ -94,14 +96,39 @@ calculate_data_response = function(){
     else if(socket.round_damage != 0) {
         socket.hp += (socket.round_damage)
     }
-    $("p .actionNotice").show();
     socket.current_action_selected = "";
     socket.current_creature_selected = "";
     console.log(socket.id)
     console.log(socket)
     console.log(socket.hp)
+    socket.emit('log_message_event', {data : 'Your HP is ' + socket.hp});
+    socket.emit("hp_event",{'user_id':socket.id,'hp':socket.hp})
 }
 
+// msg.user_id
+// msg.hp
+hp_response = function(msg) {
+    console.log($('#hpSpan'+msg.user_id))
+    console.log($('ol li #hpSpan'+msg.user_id))
+    $('#hpSpan'+msg.user_id).text(msg.hp)
+    socket.current_action_selected = null
+    socket.current_creature_selected = null
+    console.log($('#userButton .creatureSelectButton').html())
+    console.log($('.actionButton').removeAttr('disabled').html())
+    $('#userButton .creatureSelectButton').removeAttr('disabled');
+    $('.actionButton').removeAttr('disabled');
+    socket.round_defense = 0;
+    socket.charge = 0;
+    socket.round_damage = 0;
+    socket.cards_played = 0;
+    socket.first_attacker = null;
+}
+
+
+// msg.user_health_modifier
+// msg.defense_modifier
+// msg.acting_user
+// msg.target_user
 action_global_response = function(msg){
     socket.cards_played += 1;
     if(socket.cards_played == socket.room.length) {
@@ -114,5 +141,4 @@ action_global_response = function(msg){
         console.log("ready for calculations")
         socket.emit('calculate_data_event',{})
     }
-    
 }

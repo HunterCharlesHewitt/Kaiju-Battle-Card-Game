@@ -26,6 +26,8 @@ character_chosen_global =  function(msg,cb) {
 
     socket.id_to_character[msg.user_id] = (msg.character_id)
 
+    socket.id_to_hp[msg.user_id] = 20
+
     if(msg['remove_character'] != null) {
         $('#'+msg['remove_character']).removeAttr('disabled')
         $('#'+msg['remove_character']).css('background','radial-gradient(circle, #8b0000, #8b0000)')

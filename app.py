@@ -126,6 +126,11 @@ def start_battle(message):
 def calculate_data(message):
     emit('calculate_data_response')
 
+# message['user_id']
+# message['hp']
+@socket.on('hp_event')
+def hp_event(message):
+    emit('hp_response',{'user_id':message['user_id'],'hp':message['hp']}, broadcast=True)
 
 # message['user_id']
 # message['character_id']
@@ -135,7 +140,8 @@ def calculate_data(message):
 @socket.on('action_notice_event')
 def action_notice(message):
     emit('action_notice_response',{'acting_user_id':message['user_id'],'target_user_id':message['target_user_id'],'action_performed':message['current_action_selected']},room=message['target_user_id'])
-    emit('action_notice_response',{'acting_user_id':message['user_id'],'target_user_id':message['target_user_id'],'action_performed':message['current_action_selected']},room=message['user_id'])
+    if(message['target_id'] != message['user_id']):
+        emit('action_notice_response',{'acting_user_id':message['user_id'],'target_user_id':message['target_user_id'],'action_performed':message['current_action_selected']},room=message['user_id'])
 
 if __name__ == '__main__':
     socket.run(app, debug=True)
