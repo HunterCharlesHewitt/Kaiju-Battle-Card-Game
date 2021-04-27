@@ -6,20 +6,23 @@ $(document).ready(function() {
 
     $('.creatureButton').hover(creature_hover_enter, creature_hover_exit);
     
+    //global information
     socket.room = [];
+    socket.id_to_username = {};
+    socket.id_to_character = {};
+    socket.id_to_hp = {};
+    socket.character_to_id = {};
+    socket.cards_played = 0;
+    socket.global_round_actions = [];
+
+    //local information
     socket.character;
     socket.removeCharacter = null;
     socket.hp;
     socket.round_defense = 0;
     socket.charge = 0;
     socket.round_damage = 0;
-    socket.cards_played = 0;
     socket.first_attacker;
-    socket.id_to_username = {};
-    socket.id_to_character = {};
-    socket.id_to_hp = {};
-    socket.character_to_id = {};
-    socket.character_to_id = {};
     socket.current_action_selected;
     socket.current_creature_selected;
     socket.current_creature_playing;

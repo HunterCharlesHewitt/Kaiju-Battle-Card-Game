@@ -96,15 +96,7 @@ def play_cards(message):
 
     for lst in emit_list:
         emit(lst[0],lst[1],room=lst[2])
-
-    # if(target_health_modifier != 0):
-    #     emit('action_response',{'user_health_modifier':target_health_modifier,'acting_user': message['user_id']},room=message['target_user_id'])
-    # if(defense_modifier != 0 ):
-    #     emit('action_response',{'user_health_modifier':user_health_modifier,'defense_modifier':defense_modifier},room=message['user_id'])
-    # if(message['current_action_selected'] == 'heal'):
-    #     emit('action_response',{'user_health_modifier':target_health_modifier},room=message['user_id'])
-    # elif(user_health_modifier != 0):
-    #     emit('action_response',{'user_health_modifier':user_health_modifier},room=message['user_id'])
+        
     emit('action_global_response', broadcast=True)
 
 # message['target_user_id']

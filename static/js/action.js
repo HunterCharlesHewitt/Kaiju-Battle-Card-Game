@@ -10,6 +10,11 @@ play_cards = function(event){
         'target_user_id' : socket.character_to_id[socket.current_creature_selected],
         'current_creature_selected':socket.current_creature_selected, 
         'current_action_selected':socket.current_action_selected})
+    $('#userButton .creatureSelectButton').css('background-color','')
+    $('#userButton .creatureSelectButton').attr('disabled','disabled')
+    $('.actionButton').attr('disabled','disabled')
+    $('.actionButton').css('background-color','unset')
+    $('#playCards').hide()
     return false;
 }
 
@@ -135,11 +140,6 @@ action_global_response = function(msg){
     socket.cards_played += 1;
     if(socket.cards_played == socket.room.length) {
         socket.cards_played = 0
-        $('#userButton .creatureSelectButton').css('background-color','')
-        $('#userButton .creatureSelectButton').attr('disabled','disabled')
-        $('.actionButton').attr('disabled','disabled')
-        $('.actionButton').css('background-color','unset')
-        $('#playCards').hide()
         console.log("ready for calculations")
         socket.emit('calculate_data_event',{})
     }
