@@ -93,9 +93,6 @@ def first_ready(message):
 def play_cards(message):
 
     action_emit_list = perform_action(message['current_action_selected'],message['character_id'],message['target_user_id'],message['user_id'],session)
-    
-    #FIXME probably a good idea to wait to perform passives until after initial cards are played
-    passive_emit_list = perform_passive(message['current_action_selected'],message['character_id'],message['target_user_id'],message['user_id'],session)
 
     for lst in action_emit_list:
         if(lst[2] == "broadcast")
@@ -103,7 +100,25 @@ def play_cards(message):
         else:
             emit(lst[0],lst[1],room=lst[2])
 
+    #this just alerts to see if everyone has played their cards yet
     emit('action_global_response', broadcast=True)
+
+# message['user_id']
+# message['character_id']
+# message['current_creature_selected']
+# message['current_action_selected']
+# message['target_user_id']
+@socket.on('passive_event')
+def passive_event(message):
+     
+    passive_emit_list = perform_passive(message['current_action_selected'],message['character_id'],message['target_user_id'],message['user_id'],session)
+    
+    for lst in passive_emit_list:
+        if(lst[2] == "broadcast")
+            emit(lst[0],lst[1],broadcast=True)
+        else:
+            emit(lst[0],lst[1],room=lst[2])
+
 
 # message['target_user_id']
 # message['acting_user_id']

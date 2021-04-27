@@ -32,12 +32,13 @@ def soda_bottle_sp(target_user_id, user_id):
 
 def soda_bottle_passive(target_user_id, user_id,session):
     emit_list = [['soda_bottle_sp_fizz_response',{'fizz_points': 1, 'acting_user': user_id},"broadcast"]]
-    if(session['hp'] and session['hp'] == 1):
-        emit_list[*,['action_response',{'user_health_modifier': session['fizz_points'], 'acting_user': target_user_id},"broadcast"]]
-        emit_list = [['soda_bottle_sp_fizz_response',{'fizz_points': -1*session['fizz_points'], 'acting_user': user_id},"broadcast"]]
+    if(session['hp'] and session['hp'] >= 1):
+        emit_list[*,['action_response',{'user_health_modifier': session['fizz_points'], 'acting_user': target_user_id},"broadcast"],
+                    ['soda_bottle_sp_fizz_response',{'fizz_points': -1*session['fizz_points'], 'acting_user': user_id},"broadcast"]]
+    return emit_list
 
 def perform_action(action_str, character_id, target_user_id, user_id, session):
-    emit_list = []
+
     if(action_str == 'attack'):
         return attack(target_user_id, user_id)
 
@@ -55,4 +56,7 @@ def perform_action(action_str, character_id, target_user_id, user_id, session):
             return soda_bottle_sp(target_user_id, user_id)
 
 def perform_passive(action_str,character_id, target_user_id, user_id, session):
-    print("here")
+    if(character_id == 'Godzilla'):
+        return godzilla_passive(action_str, target_user_id, user_id)
+    elif(character_id == 'SodaBottle'):
+        return soda_bottle_passive(target_user_id, user_id, session)
