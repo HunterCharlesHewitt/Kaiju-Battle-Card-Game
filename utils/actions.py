@@ -9,10 +9,16 @@ def defend():
 def heal():
     return 0,3,0
 
-def perform_action(action_str):
+def perform_action(action_str, character_id):
+    print(action_str)
+    print(character_id)
     if(action_str == 'attack'):
         return attack()
     elif(action_str == 'defend'):
         return defend()
     elif(action_str == 'heal'):
         return heal()
+    elif(action_str == 'sp'):
+        if(character_id == 'Godzilla'):
+            print("here")
+            return -2,-7,0

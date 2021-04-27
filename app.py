@@ -92,12 +92,16 @@ def first_ready(message):
 @socket.on('play_cards')
 def play_cards(message):
     #fixme,add sp and passive
-    user_health_modifier,target_health_modifier,defense_modifier = perform_action(message['current_action_selected'])
+    user_health_modifier,target_health_modifier,defense_modifier = perform_action(message['current_action_selected'],message['character_id'])
+    print(user_health_modifier)
+    print(target_health_modifier)
+    print(defense_modifier)
     if(target_health_modifier != 0):
         emit('action_response',{'user_health_modifier':target_health_modifier,'acting_user': message['user_id']},room=message['target_user_id'])
-    elif(defense_modifier != 0 ):
+    if(defense_modifier != 0 ):
         emit('action_response',{'user_health_modifier':user_health_modifier,'defense_modifier':defense_modifier},room=message['user_id'])
-    elif(user_health_modifier != 0):
+    if(user_health_modifier != 0):
+        print("_____________________")
         emit('action_response',{'user_health_modifier':target_health_modifier},room=message['user_id'])
     emit('action_global_response', broadcast=True)
 
@@ -140,7 +144,7 @@ def hp_event(message):
 @socket.on('action_notice_event')
 def action_notice(message):
     emit('action_notice_response',{'acting_user_id':message['user_id'],'target_user_id':message['target_user_id'],'action_performed':message['current_action_selected']},room=message['target_user_id'])
-    if(message['target_id'] != message['user_id']):
+    if(message['target_user_id'] != message['user_id']):
         emit('action_notice_response',{'acting_user_id':message['user_id'],'target_user_id':message['target_user_id'],'action_performed':message['current_action_selected']},room=message['user_id'])
 
 if __name__ == '__main__':
