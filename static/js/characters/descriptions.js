@@ -24,9 +24,7 @@ jQuery.fn.name = function(str) {
 };
 
 function init_filenames(data) {
-    console.log("init_filenames")
     img_filenames = data;
-    console.log(img_filenames)
 }
 
 const CHARACTERS = {

@@ -10,7 +10,6 @@ def heal():
     return 0,3,0
 
 def perform_action(action_str):
-    print(action_str)
     if(action_str == 'attack'):
         return attack()
     elif(action_str == 'defend'):

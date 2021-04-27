@@ -1,9 +1,9 @@
 jQuery.fn.visible = function() {
-    return this.css('visibility', 'visible');
+    return this.removeClass('hidden');
 };
 
 jQuery.fn.show = function() {
-    return this.css('visibility', 'visible');
+    return this.removeClass('hidden');
 };
 
 jQuery.fn.id = function() {
@@ -11,15 +11,15 @@ jQuery.fn.id = function() {
 };
 
 jQuery.fn.invisible = function() {
-    return this.css('visibility', 'hidden');
+    return this.addClass('hidden');
 };
 
 jQuery.fn.hidden = function() {
-    return this.css('visibility', 'hidden');
+    return this.addClass('hidden');
 };
 
 jQuery.fn.hide = function() {
-    return this.css('visibility', 'hidden');
+    return this.addClass('hidden');
 };
 
 jQuery.fn.colorList = function() {

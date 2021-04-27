@@ -69,8 +69,6 @@ def test_username_message(message):
 #message['users_in_room']
 @socket.on('join')
 def join(message):
-    print("__________________")
-    print("In Join Function")
     join_room(message['room'])
     session['receive_count'] = session.get('receive_count', 0) + 1
     emit('log_message_response',
@@ -83,9 +81,6 @@ def join(message):
 
 @socket.on('first_ready')
 def first_ready(message):
-    print("______________________")
-    print("room size of at least 1")
-    print("being sent to{}",message['first_id_ready'])
     emit('alert_first_user',{'first_id':message['first_id_ready']}, broadcast=True)
 
 
@@ -129,7 +124,6 @@ def start_battle(message):
 
 @socket.on('calculate_data_event')
 def calculate_data(message):
-    print("here")
     emit('calculate_data_response')
 
 

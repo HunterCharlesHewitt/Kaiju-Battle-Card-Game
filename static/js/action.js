@@ -44,7 +44,7 @@ choose_target = function(event){
 //msg.action_performed
 action_notice_response = function(msg,cb) {
     console.log(msg)
-    $('body').append('<br>'+'<p class=hidden actionNotice> logs #' + socket.id_to_username[msg.acting_user_id] + ' performed ' + socket.id_to_username[msg.action_performed] +' on' + msg.target_user_id+ '. Your hp is' + socket.hp + '</p>');
+    socket.emit('log_message_event', {data : socket.id_to_username[msg.acting_user_id] + ' performed ' + socket.id_to_username[msg.action_performed] +' on' + msg.target_user_id+ '. Your hp is' + socket.hp});
 }
 
 // msg.user_health_modifier
@@ -94,7 +94,7 @@ calculate_data_response = function(){
     else if(socket.round_damage != 0) {
         socket.hp += (socket.round_damage)
     }
-    $("p").show();
+    $("p .actionNotice").show();
     socket.current_action_selected = "";
     socket.current_creature_selected = "";
     console.log(socket.id)

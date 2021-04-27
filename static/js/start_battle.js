@@ -4,10 +4,8 @@ submit_start_battle = function(event) {
 }
 
 alert_first_user_to_start_battle = function(msg,cb) {
-    console.log(socket.id)
     if(msg.first_id == socket.id)
     {
-        console.log(socket.id)
         $('#startBattle').show()
     }
     $('#waiting').hide()
@@ -17,8 +15,6 @@ alert_first_user_to_start_battle = function(msg,cb) {
 
 
 room_battle_start_response = function() {
-    console.log("room battle start")
-    console.log("__________________")
     $('#startBattle').hide()
     $('#header').hide()
     $('.creatureButton').hide()
