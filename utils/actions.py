@@ -20,5 +20,4 @@ def perform_action(action_str, character_id):
         return heal()
     elif(action_str == 'sp'):
         if(character_id == 'Godzilla'):
-            print("here")
             return -2,-7,0
