@@ -1,6 +1,9 @@
 # Kaiju-Battle-Card-Game 
 -This application is intended to be a virtual version of the Kaiju Battle Card Game created by Michael Eriksen in April 2021
 
+# Most up to date demo (4/26)
+![Demo gif](static/images/card-app-demo.gif)
+
 ## Developer Zone
 
 #### Running the Flask Application on Unix
@@ -20,7 +23,6 @@
 
         python app.py
 
-# Most up to date demo (4/26)
-![Demo gif](static/images/card-app-demo.gif)
+
         
 
