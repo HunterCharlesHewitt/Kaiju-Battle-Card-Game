@@ -95,6 +95,8 @@ calculate_data_response = function(){
     }
     else if(socket.round_damage != 0) {
         socket.hp += (socket.round_damage)
+        console.log("here")
+        console.log(socket.hp)
     }
     socket.current_action_selected = "";
     socket.current_creature_selected = "";

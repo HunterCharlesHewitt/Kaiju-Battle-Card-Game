@@ -92,18 +92,19 @@ def first_ready(message):
 @socket.on('play_cards')
 def play_cards(message):
     #fixme,add sp and passive
-    user_health_modifier,target_health_modifier,defense_modifier = perform_action(message['current_action_selected'],message['character_id'])
-    print(user_health_modifier)
-    print(target_health_modifier)
-    print(defense_modifier)
-    if(target_health_modifier != 0):
-        emit('action_response',{'user_health_modifier':target_health_modifier,'acting_user': message['user_id']},room=message['target_user_id'])
-    if(defense_modifier != 0 ):
-        emit('action_response',{'user_health_modifier':user_health_modifier,'defense_modifier':defense_modifier},room=message['user_id'])
-    if(message['current_action_selected'] == 'heal'):
-        emit('action_response',{'user_health_modifier':target_health_modifier},room=message['user_id'])
-    elif(user_health_modifier != 0):
-        emit('action_response',{'user_health_modifier':user_health_modifier},room=message['user_id'])
+    emit_list = perform_action(message['current_action_selected'],message['character_id'],message['target_user_id'],message['user_id'])
+
+    for lst in emit_list:
+        emit(lst[0],lst[1],room=lst[2])
+
+    # if(target_health_modifier != 0):
+    #     emit('action_response',{'user_health_modifier':target_health_modifier,'acting_user': message['user_id']},room=message['target_user_id'])
+    # if(defense_modifier != 0 ):
+    #     emit('action_response',{'user_health_modifier':user_health_modifier,'defense_modifier':defense_modifier},room=message['user_id'])
+    # if(message['current_action_selected'] == 'heal'):
+    #     emit('action_response',{'user_health_modifier':target_health_modifier},room=message['user_id'])
+    # elif(user_health_modifier != 0):
+    #     emit('action_response',{'user_health_modifier':user_health_modifier},room=message['user_id'])
     emit('action_global_response', broadcast=True)
 
 # message['target_user_id']
