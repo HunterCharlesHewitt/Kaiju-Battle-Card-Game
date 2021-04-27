@@ -20,5 +20,7 @@
 
         python app.py
 
+# Most up to date demo (4/26)
+![Demo gif](static/images/card-app-demo.gif)
         
 
