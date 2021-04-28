@@ -1,18 +1,18 @@
 #user_health_modifier, target_health_modifier, defend_modifier
 
 def attack(target_user_id, user_id):
-    return [['action_response',{'user_health_modifier': -5,'acting_user': user_id},target_user_id]]
+    return [['action_response',{'damage_health_modifier': -5,'acting_user': user_id},target_user_id]]
 
 def defend(target_user_id, user_id):
-    return [['action_response',{'user_health_modifier': 0,'defense_modifier':5,'acting_user': user_id},target_user_id]]
+    return [['action_response',{'damage_health_modifier': 0,'defense_modifier':5,'acting_user': user_id},target_user_id]]
 
 def heal(target_user_id, user_id):
-    return [['action_response',{'user_health_modifier': 3, 'acting_user': user_id},target_user_id]]
+    return [['action_response',{'damage_health_modifier': 0,'heal_health_modifier': 3, 'acting_user': user_id},target_user_id]]
 
 def godzilla_sp(target_user_id, user_id):
     return [
-        ['action_response',{'user_health_modifier': -7, 'acting_user': user_id, 'action':'Godzilla: Fire Breath'},target_user_id],
-        ['action_response',{'user_health_modifier': -2, 'acting_user': user_id, 'action':'Godzilla: Fire Breath'},user_id]
+        ['action_response',{'heal_health_modifier': 0,'damage_health_modifier': -7, 'acting_user': user_id, 'action':'Godzilla: Fire Breath'},target_user_id],
+        ['action_response',{'heal_health_modifier': 0,'damage_health_modifier': -2, 'acting_user': user_id, 'action':'Godzilla: Fire Breath'},user_id]
     ]
 
 #FIXME ask michael, does all damage blocked still cause 2 damage to godzilla
@@ -20,14 +20,14 @@ def godzilla_sp(target_user_id, user_id):
 def godzilla_passive(action_str, target_user_id, user_id):
     if(action_str in ('sp','attack')):
         return [
-            ['action_response',{'user_health_modifier': -2, 'acting_user': user_id, 'action':'Godzilla: Reckless'},target_user_id],
-            ['action_response',{'user_health_modifier': -2, 'acting_user': user_id, 'action':'Godzilla: Reckless'},user_id]
+            ['action_response',{'heal_health_modifier': 0,'damage_health_modifier': -2, 'acting_user': user_id, 'action':'Godzilla: Reckless'},target_user_id],
+            ['action_response',{'heal_health_modifier': 0,'damage_health_modifier': -2, 'acting_user': user_id, 'action':'Godzilla: Reckless'},user_id]
         ]
     return []
 
 def soda_bottle_sp(target_user_id, user_id):
     return [
-        ['action_response',{'user_health_modifier': -7, 'acting_user': user_id, 'action':'Soda Bottle: Unscrew Lid'},target_user_id],
+        ['action_response',{'heal_health_modifier': 0,'damage_health_modifier': -7, 'acting_user': user_id, 'action':'Soda Bottle: Unscrew Lid'},target_user_id],
         ['soda_bottle_sp_fizz_response',{'fizz_points': -2, 'acting_user': user_id, 'action':'Soda Bottle: Unscrew Lid'},"broadcast"]
     ]
 
@@ -37,7 +37,7 @@ def soda_bottle_passive(first_attacker, user_id,session):
     session['fizz_points'] += 1
     print(session['hp'])
     if(session['hp'] and session['hp'] <= 1 and first_attacker != ""): #FIXME this should actually be based off of future_hp
-        emit_list = [*emit_list,['action_response',{'user_health_modifier': -1*session['fizz_points'], 'acting_user': user_id},first_attacker],
+        emit_list = [*emit_list,['action_response',{'heal_health_modifier': 0,'damage_health_modifier': -1*session['fizz_points'], 'acting_user': user_id},first_attacker],
                     ['soda_bottle_sp_fizz_response',{'fizz_points': -1*session['fizz_points'], 'acting_user': user_id},"broadcast"]]
         session['fizz_points'] = 0
     return emit_list

@@ -54,29 +54,29 @@ action_notice_response = function(msg,cb) {
         cb();
 }
 
-// msg.user_health_modifier
+// msg.heal_health_modifier
+// msg.damage_health_modifier
 // msg.defense_modifier
 // msg.acting_user
 // msg.action
 action_response = function(msg){
     console.log("action from " + socket.id_to_username[msg.acting_user])
-    console.log("health: " + msg.user_health_modifier)
+    console.log("heal health: " + msg.heal_health_modifier)
+    console.log("damage health: " + msg.damage_health_modifier)
     console.log("defense: " + msg.defense_modifier)
     if(msg.action)
         console.log("action: " + msg.action) 
 
-    if(msg.user_health_modifier >= 0) {
-        console.log("here")
-        //FIXME don't actually change hp until after passive part socket.hp += msg.user_health_modifier;
-    }
-    else {
-        socket.round_damage += msg.user_health_modifier;
-        socket.first_attacker = msg.acting_user;
-    }
+    socket.round_damage += msg.damage_health_modifier
 
-    if(msg.defense_modifier) {
-        socket.round_defense += msg.defense_modifier
-    }
+    socket.round_defense += msg.defense_modifier
+
+    socket.hp += msg.heal_health_modifier
+
+    console.log("round damage: " + socket.round_damage)
+    console.log("round defense: " + socket.round_defense)
+    console.log("hp: " + socket.hp)
+    
 }
 
 passive_response = function(msg){
