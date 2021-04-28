@@ -23,8 +23,10 @@ $(document).ready(function() {
     socket.removeCharacter = null;
     socket.hp;
     socket.round_defense = 0;
+    socket.passive_defense = 0;
     socket.charge = 0;
     socket.round_damage = 0;
+    socket.passive_damage = 0;
     socket.first_attacker;
     socket.current_action_selected;
     socket.current_creature_selected;
@@ -69,5 +71,5 @@ $(document).ready(function() {
     //_____________character specific_______________________________
     socket.on('soda_bottle_sp_fizz_response',soda_bottle_sp_fizz_response)
     
-    socket.on('hp_response',hp_response)
+    socket.on('passive_reponse',passive_response)
 });

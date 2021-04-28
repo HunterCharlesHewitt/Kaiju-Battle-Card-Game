@@ -20,7 +20,6 @@ play_cards = function(event){
 }
 
 choose_action = function(event){
-    console.log('action button')
     socket.current_action_selected = $(this).attr('id');
     $('.actionButton').css('background-color','unset')
     $(this).css('background-color','SeaGreen');
@@ -58,60 +57,64 @@ action_notice_response = function(msg,cb) {
 // msg.user_health_modifier
 // msg.defense_modifier
 // msg.acting_user
+// msg.action
 action_response = function(msg){
     console.log("action from " + socket.id_to_username[msg.acting_user])
     console.log("health: " + msg.user_health_modifier)
     console.log("defense: " + msg.defense_modifier)
+    if(msg.action)
+        console.log("action: " + msg.action) 
 
     if(msg.user_health_modifier >= 0) {
         console.log("here")
-        socket.hp += msg.user_health_modifier;
+        //FIXME don't actually change hp until after passive part socket.hp += msg.user_health_modifier;
     }
     else {
-        console.log("here")
         socket.round_damage += msg.user_health_modifier;
         socket.first_attacker = msg.acting_user;
-        console.log(socket.first_attacker)
     }
 
     if(msg.defense_modifier) {
-        console.log(msg.defense_modifier)
-        console.log(socket.round_defense)
         socket.round_defense += msg.defense_modifier
     }
+}
+
+passive_response = function(msg){
+
 }
 
 //msg.target_user_id
 //msg.acting_user_id
 block_damage_response = function(msg) {
-    socket.hp -= 1;
+    socket.hp -= 1; //fixme make this potential hp
     socket.emit('log_message_event', {data : "You take one block damage from " + socket.id_to_character[msg.acting_user_id]});
     socket.emit('log_message_event', {data : 'Your HP is ' + socket.hp});
 }
 
 calculate_data_response = function(){
+    console.log("calculating data")
     if(socket.first_attacker && socket.round_defense > 0) {
-        console.log(socket.round_damage)
-        console.log(socket.round_defense)
         socket.hp += (socket.round_damage + socket.round_defense)
         socket.emit('block_damage_event',{'target_user_id': socket.first_attacker, 'acting_user_id':socket.id})
     }
     else if(socket.round_damage != 0) {
         socket.hp += (socket.round_damage)
-        console.log("here")
-        console.log(socket.hp)
-    }
-    socket.current_action_selected = "";
-    socket.current_creature_selected = "";
+    };
     console.log(socket.hp)
+    console.log(socket.character_to_id[socket.current_creature_selected])
+    console.log(socket)
     socket.emit('log_message_event', {data : 'Your HP is ' + socket.hp});
     socket.emit("hp_event",{'user_id':socket.id,'hp':socket.hp})
 }
 
+post_passive_calculate_data_response = function() {
+
+}
+
 // msg.user_id
 // msg.hp
-hp_response = function(msg) {
-    $('#hpSpan'+msg.user_id).text(msg.hp)
+passive_response =function(msg){
+    console.log("passive response")
     socket.current_action_selected = null
     socket.current_creature_selected = null
     $('#userButton .creatureSelectButton').removeAttr('disabled');
@@ -121,6 +124,7 @@ hp_response = function(msg) {
     socket.round_damage = 0;
     socket.cards_played = 0;
     socket.first_attacker = null;
+    $('#hpSpan'+socket.id).text(socket.hp)
 }
 
 

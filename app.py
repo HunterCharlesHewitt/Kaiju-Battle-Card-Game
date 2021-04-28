@@ -121,6 +121,7 @@ def passive_event(message):
             print(lst)
             emit(lst[0],lst[1],room=lst[2])
 
+    emit('passive_response',{'user_id':message['user_id'],'hp':session['hp']}, broadcast=True)
 
 # message['target_user_id']
 # message['acting_user_id']
@@ -156,7 +157,6 @@ def calculate_data(message):
 @socket.on('hp_event')
 def hp_event(message):
     session['hp'] = message['hp']
-    emit('hp_response',{'user_id':message['user_id'],'hp':message['hp']}, broadcast=True)
 
 # message['user_id']
 # message['character_id']
