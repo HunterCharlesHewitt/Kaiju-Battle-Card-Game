@@ -1,7 +1,7 @@
 from flask import Flask, render_template, session, copy_current_request_context, url_for
 from flask_socketio import SocketIO, emit, disconnect, join_room, rooms
 from threading import Lock
-from utils.actions import perform_action
+from utils.actions import perform_action, perform_passive
 import json
 
 async_mode = None
@@ -95,7 +95,7 @@ def play_cards(message):
     action_emit_list = perform_action(message['current_action_selected'],message['character_id'],message['target_user_id'],message['user_id'],session)
 
     for lst in action_emit_list:
-        if(lst[2] == "broadcast")
+        if(lst[2] == "broadcast"):
             emit(lst[0],lst[1],broadcast=True)
         else:
             emit(lst[0],lst[1],room=lst[2])
@@ -108,15 +108,17 @@ def play_cards(message):
 # message['current_creature_selected']
 # message['current_action_selected']
 # message['target_user_id']
+# message['first_attacker]
 @socket.on('passive_event')
 def passive_event(message):
      
-    passive_emit_list = perform_passive(message['current_action_selected'],message['character_id'],message['target_user_id'],message['user_id'],session)
-    
+    passive_emit_list = perform_passive(message['current_action_selected'],message['character_id'],message['target_user_id'],message['user_id'],message['first_attacker'],session)
+
     for lst in passive_emit_list:
-        if(lst[2] == "broadcast")
+        if(lst[2] == "broadcast"):
             emit(lst[0],lst[1],broadcast=True)
         else:
+            print(lst)
             emit(lst[0],lst[1],room=lst[2])
 
 
@@ -129,6 +131,8 @@ def block_damage_event(message):
 
 @socket.on('character_chosen')
 def character_chosen(message):
+    #FIXME make health based on character
+    session['hp'] = 20
     session['character'] = message['character_id']
     if(session['character'] == 'SodaBottle'):
         session['fizz_points'] = 0

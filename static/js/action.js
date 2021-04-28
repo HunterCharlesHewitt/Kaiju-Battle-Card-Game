@@ -94,9 +94,6 @@ calculate_data_response = function(){
         console.log(socket.round_damage)
         console.log(socket.round_defense)
         socket.hp += (socket.round_damage + socket.round_defense)
-        console.log("sending block damage")
-        console.log("first attacker" + socket.first_attacker)
-        console.log("sent by" + socket.id)
         socket.emit('block_damage_event',{'target_user_id': socket.first_attacker, 'acting_user_id':socket.id})
     }
     else if(socket.round_damage != 0) {
@@ -106,8 +103,6 @@ calculate_data_response = function(){
     }
     socket.current_action_selected = "";
     socket.current_creature_selected = "";
-    console.log(socket.id)
-    console.log(socket)
     console.log(socket.hp)
     socket.emit('log_message_event', {data : 'Your HP is ' + socket.hp});
     socket.emit("hp_event",{'user_id':socket.id,'hp':socket.hp})
@@ -116,13 +111,9 @@ calculate_data_response = function(){
 // msg.user_id
 // msg.hp
 hp_response = function(msg) {
-    console.log($('#hpSpan'+msg.user_id))
-    console.log($('ol li #hpSpan'+msg.user_id))
     $('#hpSpan'+msg.user_id).text(msg.hp)
     socket.current_action_selected = null
     socket.current_creature_selected = null
-    console.log($('#userButton .creatureSelectButton').html())
-    console.log($('.actionButton').removeAttr('disabled').html())
     $('#userButton .creatureSelectButton').removeAttr('disabled');
     $('.actionButton').removeAttr('disabled');
     socket.round_defense = 0;
@@ -139,13 +130,22 @@ hp_response = function(msg) {
 // msg.target_user
 action_global_response = function(msg){
     socket.cards_played += 1;
+    first_attacker = socket.first_attacker != null ? socket.first_attacker : ""
     if(socket.cards_played == socket.room.length) {
         socket.cards_played = 0
-        console.log("ready for calculations")
         socket.emit('calculate_data_event',{})
         socket.emit('passive_event',{'user_id':socket.id, 'character_id' : socket.current_creature_playing, 
         'target_user_id' : socket.character_to_id[socket.current_creature_selected],
         'current_creature_selected':socket.current_creature_selected, 
-        'current_action_selected':socket.current_action_selected})
+        'current_action_selected':socket.current_action_selected,
+        'first_attacker':socket.first_attacker})
     }
+}
+
+
+// msg.fizz_points
+// msg.acting_user
+soda_bottle_sp_fizz_response = function(msg){
+    socket.soda_bottle_fizz_points += (msg.fizz_points)
+    console.log("fizz points:" + socket.soda_bottle_fizz_points)
 }

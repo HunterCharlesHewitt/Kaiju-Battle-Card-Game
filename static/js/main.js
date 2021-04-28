@@ -65,5 +65,9 @@ $(document).ready(function() {
     socket.on('action_global_response',action_global_response)
     socket.on('calculate_data_response',calculate_data_response)
     socket.on('block_damage_response',block_damage_response)
+
+    //_____________character specific_______________________________
+    socket.on('soda_bottle_sp_fizz_response',soda_bottle_sp_fizz_response)
+    
     socket.on('hp_response',hp_response)
 });

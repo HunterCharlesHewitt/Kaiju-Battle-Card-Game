@@ -26,15 +26,18 @@ def godzilla_passive(action_str, target_user_id, user_id):
 
 def soda_bottle_sp(target_user_id, user_id):
     return [
-        ['action_response',{'user_health_modifier': -6, 'acting_user': user_id},target_user_id],
+        ['action_response',{'user_health_modifier': -7, 'acting_user': user_id},target_user_id],
         ['soda_bottle_sp_fizz_response',{'fizz_points': -2, 'acting_user': user_id},"broadcast"] #FIXME implement this response
     ]
 
-def soda_bottle_passive(target_user_id, user_id,session):
+def soda_bottle_passive(first_attacker, user_id,session):
     emit_list = [['soda_bottle_sp_fizz_response',{'fizz_points': 1, 'acting_user': user_id},"broadcast"]]
-    if(session['hp'] and session['hp'] >= 1):
-        emit_list[*,['action_response',{'user_health_modifier': session['fizz_points'], 'acting_user': target_user_id},"broadcast"],
+    session['fizz_points'] += 1
+    print(session['hp'])
+    if(session['hp'] and session['hp'] <= 1 and first_attacker != ""):
+        emit_list = [*emit_list,['action_response',{'user_health_modifier': -1*session['fizz_points'], 'acting_user': user_id},first_attacker],
                     ['soda_bottle_sp_fizz_response',{'fizz_points': -1*session['fizz_points'], 'acting_user': user_id},"broadcast"]]
+        session['fizz_points'] = 0
     return emit_list
 
 def perform_action(action_str, character_id, target_user_id, user_id, session):
@@ -55,8 +58,8 @@ def perform_action(action_str, character_id, target_user_id, user_id, session):
         if(character_id == 'SodaBottle'):
             return soda_bottle_sp(target_user_id, user_id)
 
-def perform_passive(action_str,character_id, target_user_id, user_id, session):
+def perform_passive(action_str,character_id, target_user_id, user_id, first_attacker,session):
     if(character_id == 'Godzilla'):
         return godzilla_passive(action_str, target_user_id, user_id)
     elif(character_id == 'SodaBottle'):
-        return soda_bottle_passive(target_user_id, user_id, session)
+        return soda_bottle_passive(first_attacker, user_id, session)
