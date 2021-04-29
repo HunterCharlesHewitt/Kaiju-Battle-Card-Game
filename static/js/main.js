@@ -14,19 +14,13 @@ $(document).ready(function() {
     socket.character_to_id = {};
     socket.cards_played = 0;
     socket.global_round_actions = [];
+    socket.id_to_creature_object = [];
 
-    //global character information
-    socket.soda_bottle_fizz_points = 0;
 
     //local information
     socket.character;
     socket.removeCharacter = null;
     socket.hp;
-    socket.round_defense = 0;
-    socket.passive_defense = 0;
-    socket.charge = 0;
-    socket.round_damage = 0;
-    socket.passive_damage = 0;
     socket.attackers = [];
     socket.current_action_selected;
     socket.current_creature_selected;
@@ -59,17 +53,5 @@ $(document).ready(function() {
     socket.on('room_battle_start_response',room_battle_start_response);
 
 //__________________action.js______________________________________
-    $('.actionButton').click(choose_action)
-    $('#userButton').on('click','.creatureSelectButton',choose_target);
-    $('#playCards').submit(play_cards)
-    socket.on('action_response',action_response)
-    socket.on('action_notice_response',action_notice_response)
-    socket.on('action_global_response',action_global_response)
-    socket.on('calculate_data_response',calculate_data_response)
-    socket.on('block_damage_response',block_damage_response)
 
-    //_____________character specific_______________________________
-    socket.on('soda_bottle_sp_fizz_response',soda_bottle_sp_fizz_response)
-    
-    socket.on('passive_reponse',passive_response)
 });

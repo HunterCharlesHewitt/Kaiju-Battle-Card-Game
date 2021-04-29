@@ -7,10 +7,12 @@ choose_character_button = function(event) {
     
     //FIXME
     socket.hp = 20
-    socket.emit('character_chosen', {'character_id': $(this).attr('id'), 'user_id': socket.id, 'remove_character': socket.removeCharacter});
+    socket.emit('character_chosen_event', {'character_id': $(this).attr('id'), 'user_id': socket.id, 'remove_character': socket.removeCharacter});
     return false;
 }
 
+// msg['character_id']
+// msg['user_id'] 
 character_chosen_local = function(msg,cb) {
     $('#header').html((msg.character_id + " chosen"));
     if (cb)
@@ -18,6 +20,9 @@ character_chosen_local = function(msg,cb) {
 }
 
 
+// message['remove_character']
+// message['character_id']
+// message['user_id']
 character_chosen_global =  function(msg,cb) {
     $('#'+msg.character_id).attr('disabled','disabled');
     $('#'+msg.character_id).css('background','radial-gradient(circle, #423f3f, #080303)')
@@ -32,6 +37,8 @@ character_chosen_global =  function(msg,cb) {
         $('#'+msg['remove_character']).removeAttr('disabled')
         $('#'+msg['remove_character']).css('background','radial-gradient(circle, #8b0000, #8b0000)')
     }
+    socket.emit('character_chosen_event_session', {'character_id':msg.character_id,'user_id':msg.user_id});
+    //socket.emit('character_chosen_session_event',{'character_id':msg.character_id,'user_id':msg.user_id})
 
     var first_user_ready;
     if(socket.room.length > 0 && socket.id_to_character && Object.keys(socket.id_to_character).length > 1)
@@ -57,7 +64,9 @@ character_chosen_global =  function(msg,cb) {
         });
 
     }
-    $('#log').append('<br>' + $('<div/>').text('logs #' + msg.count + ': '+ msg.username + " has chosen " + msg.character_id).html());
+    $('#log').append('<br>' + $('<div/>').text('logs: '+ msg.username + " has chosen " + msg.character_id).html());
+
+    socket.emit('character_chosen_session_event',)
     if (cb)
         cb();
 }

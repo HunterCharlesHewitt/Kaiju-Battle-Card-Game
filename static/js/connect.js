@@ -3,7 +3,7 @@ connect = function() {
 }
 
 log_message_response = function(msg, cb) {
-    $('#log').append('<br>' + $('<div/>').text('logs #' + msg.count + ': ' + msg.data).html());
+    $('#log').append('<br>' + $('<div/>').text('logs: ' + msg.data).html());
     if (cb)
         cb();
 }
