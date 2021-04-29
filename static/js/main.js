@@ -22,9 +22,8 @@ $(document).ready(function() {
     socket.removeCharacter = null;
     socket.hp;
     socket.attackers = [];
-    socket.current_action_selected;
-    socket.current_creature_selected;
-    socket.current_creature_playing;
+    socket.action_selected;
+    socket.target_creature_selected;
     socket.in_room = false;
 
 //__________________connect.js__________________________________
@@ -53,5 +52,7 @@ $(document).ready(function() {
     socket.on('room_battle_start_response',room_battle_start_response);
 
 //__________________action.js______________________________________
-
+    $('.actionButton').click(choose_action)
+    $('#userButton').on('click','.creatureSelectButton',choose_target);
+    $('#playCards').submit(play_cards)
 });

@@ -97,19 +97,39 @@ def character_chosen_event(message):
 # message['user_id'] 
 @socket.on('character_chosen_event_session')
 def character_chosen_event_session(message):
-    print("here")
     user_id = message['user_id']
     char_id = message['character_id']
     if(char_id == 'Godzilla'):
         session[user_id] = Godzilla(user_id)
     elif(char_id == 'SodaBottle'):
         session[user_id] = Soda_Bottle(user_id)
-    print(session)
 
 
 @socket.on('start_battle')
 def start_battle(message):
     emit('room_battle_start_response',room=message['room'])
+
+# message['action']
+# message['target_user_id']
+# message['target_creature']
+# message['user_id']
+# message['user_creature']
+@socket.on('local_action_event')
+def local_action_event(message):
+    action = message['action']
+    target = message['target_user_id']
+    user_id = message['user_id']
+    if(action == 'defend'):
+        session[user_id].defend(target)
+    elif(action == 'heal'):
+        session[user_id].heal(target)
+    elif(action == 'attack'):
+        session[user_id].attack(target)
+    elif(action == 'sp'):
+        session[user_id].sp(target)
+
+    print(message['target_creature'] + ": " + str(session[target]))
+    print(message['user_creature'] + ": " + str(session[user_id]))
 
 if __name__ == '__main__':
     socket.run(app, debug=True)
