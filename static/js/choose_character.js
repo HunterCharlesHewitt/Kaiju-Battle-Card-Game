@@ -38,7 +38,6 @@ character_chosen_global =  function(msg,cb) {
         $('#'+msg['remove_character']).css('background','radial-gradient(circle, #8b0000, #8b0000)')
     }
     socket.emit('character_chosen_event_session', {'character_id':msg.character_id,'user_id':msg.user_id});
-    //socket.emit('character_chosen_session_event',{'character_id':msg.character_id,'user_id':msg.user_id})
 
     var first_user_ready;
     if(socket.room.length > 0 && socket.id_to_character && Object.keys(socket.id_to_character).length > 1)
