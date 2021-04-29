@@ -1,10 +1,10 @@
 #user_health_modifier, target_health_modifier, defend_modifier
 
 def attack(target_user_id, user_id):
-    return [['action_response',{'damage_health_modifier': -5,'acting_user': user_id},target_user_id]]
+    return [['action_response',{'damage_health_modifier': -5,'heal_health_modifier':0,'acting_user': user_id},target_user_id]]
 
 def defend(target_user_id, user_id):
-    return [['action_response',{'damage_health_modifier': 0,'defense_modifier':5,'acting_user': user_id},target_user_id]]
+    return [['action_response',{'damage_health_modifier': 0,'heal_health_modifier':0,'defense_modifier':5,'acting_user': user_id},target_user_id]]
 
 def heal(target_user_id, user_id):
     return [['action_response',{'damage_health_modifier': 0,'heal_health_modifier': 3, 'acting_user': user_id},target_user_id]]

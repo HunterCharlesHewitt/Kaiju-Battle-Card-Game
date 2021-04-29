@@ -64,8 +64,16 @@ action_response = function(msg){
     console.log("heal health: " + msg.heal_health_modifier)
     console.log("damage health: " + msg.damage_health_modifier)
     console.log("defense: " + msg.defense_modifier)
+    
+    msg.defense_modifier = msg.defense_modifier != null ? msg.defense_modifier : 0
+    msg.heal_health_modifier = msg.heal_health_modifier != null ? msg.heal_health_modifier : 0
+    msg.damage_health_modifier = msg.damage_health_modifier != null ? msg.damage_health_modifier : 0
+
     if(msg.action)
         console.log("action: " + msg.action) 
+
+    if(msg.damage_health_modifier < 0)
+        socket.attackers.push(msg.acting_user)
 
     socket.round_damage += msg.damage_health_modifier
 
@@ -93,9 +101,9 @@ block_damage_response = function(msg) {
 
 calculate_data_response = function(){
     console.log("calculating data")
-    if(socket.first_attacker && socket.round_defense > 0) {
+    if(socket.attackers && socket.attackers.length > 0 && socket.round_defense > 0) {
         socket.hp += (socket.round_damage + socket.round_defense)
-        socket.emit('block_damage_event',{'target_user_id': socket.first_attacker, 'acting_user_id':socket.id})
+        socket.emit('block_damage_event',{'target_user_id': socket.attackers[0], 'acting_user_id':socket.id})
     }
     else if(socket.round_damage != 0) {
         socket.hp += (socket.round_damage)
@@ -123,7 +131,7 @@ passive_response =function(msg){
     socket.charge = 0;
     socket.round_damage = 0;
     socket.cards_played = 0;
-    socket.first_attacker = null;
+    socket.attackers = [];
     $('#hpSpan'+socket.id).text(socket.hp)
 }
 
@@ -134,7 +142,6 @@ passive_response =function(msg){
 // msg.target_user
 action_global_response = function(msg){
     socket.cards_played += 1;
-    first_attacker = socket.first_attacker != null ? socket.first_attacker : ""
     if(socket.cards_played == socket.room.length) {
         socket.cards_played = 0
         socket.emit('calculate_data_event',{})
@@ -142,7 +149,7 @@ action_global_response = function(msg){
         'target_user_id' : socket.character_to_id[socket.current_creature_selected],
         'current_creature_selected':socket.current_creature_selected, 
         'current_action_selected':socket.current_action_selected,
-        'first_attacker':socket.first_attacker})
+        'first_attacker':socket.attackers[0]})
     }
 }
 
