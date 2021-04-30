@@ -40,3 +40,10 @@ play_cards = function (event) {
   $(".actionButton").css("background-color", "unset");
   return false;
 };
+
+play_cards_global = function (event) {
+    socket.cards_played += 1
+    if(socket.cards_played == socket.room.length) {
+        
+    }
+}

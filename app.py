@@ -4,6 +4,7 @@ from utils.Godzilla import Godzilla
 from utils.Soda_Bottle import Soda_Bottle
 from threading import Lock
 import json
+import logging
 
 async_mode = None
 app = Flask(__name__)
@@ -131,5 +132,11 @@ def local_action_event(message):
     print(message['target_creature'] + ": " + str(session[target]))
     print(message['user_creature'] + ": " + str(session[user_id]))
 
+    #could do a global emit from here to update everyone's stuff (or remove above code and place it in a local_action_event)
+
 if __name__ == '__main__':
+    logging.getLogger('socketio').setLevel(logging.ERROR)
+    logging.getLogger('engineio').setLevel(logging.ERROR)
+    logging.getLogger('geventwebsocket.handler').setLevel(logging.ERROR)
     socket.run(app, debug=True)
+    

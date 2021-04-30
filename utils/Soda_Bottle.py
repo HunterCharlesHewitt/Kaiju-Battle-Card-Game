@@ -25,3 +25,7 @@ class Soda_Bottle(Creature):
     def explode(target_user_id):
         super().send_unblockable_damage(target_user_id, -1*self.fizz_points)
         self.fizz_points = 0
+
+    def __str__(self):
+        string = super().__str__()
+        return string + "Fizz Points: " + str(self.fizz_points) + "\n" + "________________________________"
