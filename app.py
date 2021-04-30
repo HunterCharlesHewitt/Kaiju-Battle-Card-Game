@@ -49,7 +49,7 @@ def log_broadcast_message(message):
          {'data': message['data'], 'count': session['receive_count']},
          broadcast=True)
 
-#message['username']
+# message['username']
 #message['user_id']
 @socket.on('username_event')
 def test_username_message(message):
