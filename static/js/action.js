@@ -41,9 +41,23 @@ play_cards = function (event) {
   return false;
 };
 
-play_cards_global = function (event) {
-    socket.cards_played += 1
-    if(socket.cards_played == socket.room.length) {
-        
-    }
+// msg['action']
+// msg['target_user_id']
+// msg['target_creature']
+// msg['user_id']
+// msg['user_creature']
+local_action_response = function (msg,cb) {
+  socket.cards_played += 1
+  if(socket.cards_played == socket.room.length) {
+      
+  }
+  socket.emit('global_action_event',{
+    'action' : msg['action'],
+    'target_user_id' : msg['target_user_id'],
+    'target_creature' : msg['target_creature_id'],
+    'user_id' : msg['user_id'],
+    'user_creature' : msg['user_creature']
+  })
+  if (cb)
+    cb();
 }

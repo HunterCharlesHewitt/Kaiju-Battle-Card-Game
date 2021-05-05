@@ -19,3 +19,7 @@ class Godzilla(Creature):
     def sp(self,target_user_id):
         super().send_unblockable_damage(self.user_id, -4)
         super().send_damage(target_user_id, -9)
+
+    def __str__(self):
+        string = super().__str__()
+        return string + "\n________________________________\n" 

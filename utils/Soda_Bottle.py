@@ -28,4 +28,4 @@ class Soda_Bottle(Creature):
 
     def __str__(self):
         string = super().__str__()
-        return string + "Fizz Points: " + str(self.fizz_points) + "\n" + "________________________________"
+        return string + "Fizz Points: " + str(self.fizz_points) + "\n________________________________\n" 

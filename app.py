@@ -55,6 +55,8 @@ def log_broadcast_message(message):
 def test_username_message(message):
     session['username'] = message['username']
     session['user_id'] = message['user_id']
+    print(session)
+    print('/n')
     emit('log_message_response',
          {'data': message['username'] + " has joined"},
          broadcast=True)
@@ -117,6 +119,16 @@ def start_battle(message):
 # message['user_creature']
 @socket.on('local_action_event')
 def local_action_event(message):
+    emit('local_action_response',{
+        'action' : message['action'],
+        'target_user_id' : message['target_user_id'],
+        'target_creature' : message['target_creature'],
+        'user_id' : message['user_id'],
+        'user_creature' : message['user_creature']
+    }, broadcast=True)
+
+@socket.on('global_action_event')
+def global_action_event(message):
     action = message['action']
     target = message['target_user_id']
     user_id = message['user_id']
@@ -129,10 +141,8 @@ def local_action_event(message):
     elif(action == 'sp'):
         session[user_id].sp(target)
 
-    print(message['target_creature'] + ": " + str(session[target]))
-    print(message['user_creature'] + ": " + str(session[user_id]))
-
-    #could do a global emit from here to update everyone's stuff (or remove above code and place it in a local_action_event)
+    print(str(session[target]))
+    print(str(session[user_id]))
 
 if __name__ == '__main__':
     logging.getLogger('socketio').setLevel(logging.ERROR)

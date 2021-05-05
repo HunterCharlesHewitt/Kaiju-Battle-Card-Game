@@ -55,4 +55,5 @@ $(document).ready(function() {
     $('.actionButton').click(choose_action)
     $('#userButton').on('click','.creatureSelectButton',choose_target);
     $('#playCards').submit(play_cards)
+    socket.on('local_action_response', local_action_response)
 });

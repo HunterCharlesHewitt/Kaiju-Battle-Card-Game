@@ -44,7 +44,7 @@ class Creature:
         self.round_unblockable_damage_modifier += modifier
 
     def __str__(self):
-        string = ""
+        string = "\n________________________________\n" + self.__class__.__name__ + "\n"
         string += ("User ID: " + str(self.user_id) + '\n')
         string += ("Round Damage Modifier: " + str(self.round_damage_modifier) + '\n')
         string += ("Round Unblockable Damage Modifier: " + str(self.round_unblockable_damage_modifier) + '\n')
