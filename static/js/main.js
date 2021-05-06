@@ -12,7 +12,7 @@ $(document).ready(function() {
     socket.id_to_character = {};
     socket.id_to_hp = {};
     socket.character_to_id = {};
-    socket.cards_played = 0;
+    socket.stage1_cards_played = 0;
     socket.global_round_actions = [];
     socket.id_to_creature_object = [];
 

@@ -5,6 +5,7 @@ class Soda_Bottle(Creature):
     def __init__(self,user_id):
         super().__init__(user_id,20)
         self.fizz_points = 0
+        self.explode_target = None
 
     def attack(self,target_user_id):
         self.fizz_points += 1
@@ -19,11 +20,35 @@ class Soda_Bottle(Creature):
         super().heal(target_user_id)
 
     def sp(target_user_id):
-        self.fizz_points -= 1 #technically subtracting 2 since we don't add one and instead subtract
+        self.fizz_points -= 2 
         super().send_damage(target_user_id,-7)
 
-    def explode(target_user_id):
-        super().send_unblockable_damage(target_user_id, -1*self.fizz_points)
+    def receive_damage(self, modifier):
+        super().receive_damage(modifier)
+        self.explode_check()
+
+    def receive_unblockable_damage(self,modifier):
+        super().receive_unblockable_damage(modifier)
+        self.explode_check()
+
+    def receive_defense(self, modifier):
+        super().receive_defense(modifier)
+        self.explode_check()
+
+    def receive_healing(self, modifier):
+        super().receive_healing(modifier)
+        self.explode_check()
+
+    def explode_check(self):
+        damage_after_block = min(0,self.round_damage_modifier + self.round_defense_modifier)
+        total_round_damage = damage_after_block + self.round_unblockable_damage_modifier + self.round_healing_modifier
+        if(self.hp + total_round_damage <= 1 and self.round_attackers.length > 0):
+            self.explode_target = self.round_attackers[-1]
+        else:
+            self.explode_target = None
+
+    def explode():
+        super().send_unblockable_damage(self.explode_target, -1*self.fizz_points)
         self.fizz_points = 0
 
     def __str__(self):

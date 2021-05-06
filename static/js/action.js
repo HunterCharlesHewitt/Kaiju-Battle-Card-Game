@@ -47,10 +47,6 @@ play_cards = function (event) {
 // msg['user_id']
 // msg['user_creature']
 local_action_response = function (msg,cb) {
-  socket.cards_played += 1
-  if(socket.cards_played == socket.room.length) {
-      
-  }
   socket.emit('global_action_event',{
     'action' : msg['action'],
     'target_user_id' : msg['target_user_id'],
@@ -58,6 +54,11 @@ local_action_response = function (msg,cb) {
     'user_id' : msg['user_id'],
     'user_creature' : msg['user_creature']
   })
+  // TODO: make the server keep track of cards played and when to emit that the stage is finished
+  // socket.stage1_cards_played += 1
+  // if(socket.stage1_cards_played == socket.room.length) {
+  //     socket.emit('stage1_finished_event',{})
+  // }
   if (cb)
     cb();
 }

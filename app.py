@@ -55,8 +55,6 @@ def log_broadcast_message(message):
 def test_username_message(message):
     session['username'] = message['username']
     session['user_id'] = message['user_id']
-    print(session)
-    print('/n')
     emit('log_message_response',
          {'data': message['username'] + " has joined"},
          broadcast=True)
@@ -88,7 +86,6 @@ def first_ready(message):
 # message['user_id']
 @socket.on('character_chosen_event')
 def character_chosen_event(message):
-    print("Character Chosen Event")
     emit('character_chosen_local',
          {'character_id': message['character_id'], 'user_id': message['user_id']})
     emit('character_chosen_global',
@@ -144,9 +141,13 @@ def global_action_event(message):
     print(str(session[target]))
     print(str(session[user_id]))
 
+@socket.on('stage1_finished_event')
+def stage1_finished_event(message):
+    print("here")
+
 if __name__ == '__main__':
     logging.getLogger('socketio').setLevel(logging.ERROR)
     logging.getLogger('engineio').setLevel(logging.ERROR)
     logging.getLogger('geventwebsocket.handler').setLevel(logging.ERROR)
-    socket.run(app, debug=True)
+    socket.run(app, debug=False)
     
