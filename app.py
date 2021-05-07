@@ -69,6 +69,7 @@ def test_username_message(message):
 #message['users_in_room']
 @socket.on('join')
 def join(message):
+    session['room'] = message['room']
     join_room(message['room'])
     emit('log_message_response',
          {'data': 'In rooms: ' + ', '.join(rooms())})
@@ -76,6 +77,11 @@ def join(message):
             {'username':session['username'], 'user_id':message['user_id']},
             broadcast=True)
     emit('join_response_local')
+
+# message['num_in_room']
+@socket.on('num_in_room')
+def num_in_room(message):
+    session['num_in_room'] = message['num_in_room']
 
 @socket.on('first_ready')
 def first_ready(message):
@@ -86,6 +92,7 @@ def first_ready(message):
 # message['user_id']
 @socket.on('character_chosen_event')
 def character_chosen_event(message):
+    session['stage1_cards_played'] = 0
     emit('character_chosen_local',
          {'character_id': message['character_id'], 'user_id': message['user_id']})
     emit('character_chosen_global',
@@ -116,16 +123,11 @@ def start_battle(message):
 # message['user_creature']
 @socket.on('local_action_event')
 def local_action_event(message):
-    emit('local_action_response',{
-        'action' : message['action'],
-        'target_user_id' : message['target_user_id'],
-        'target_creature' : message['target_creature'],
-        'user_id' : message['user_id'],
-        'user_creature' : message['user_creature']
-    }, broadcast=True)
+    emit('local_action_response',message, room=session['room'])
 
 @socket.on('global_action_event')
 def global_action_event(message):
+
     action = message['action']
     target = message['target_user_id']
     user_id = message['user_id']
@@ -138,11 +140,15 @@ def global_action_event(message):
     elif(action == 'sp'):
         session[user_id].sp(target)
 
-    print(str(session[target]))
-    print(str(session[user_id]))
+    session['stage1_cards_played'] += 1
+    if(session['stage1_cards_played'] == session['num_in_room']):
+        socket.emit('stage1_response')
+
+    # print(str(session[target]))
+    # print(str(session[user_id]))
 
 @socket.on('stage1_finished_event')
-def stage1_finished_event(message):
+def stage1_finished_event():
     print("here")
 
 if __name__ == '__main__':

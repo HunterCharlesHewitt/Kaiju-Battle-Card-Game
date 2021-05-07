@@ -3,6 +3,7 @@
 //msg.user_id
 join_response_global = function(msg,cb) {
     socket.room.push(msg.user_id)
+    socket.emit('num_in_room',{'num_in_room': socket.room.length } )
     if (cb)
         cb();
 }

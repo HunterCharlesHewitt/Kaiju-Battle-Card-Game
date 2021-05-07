@@ -54,11 +54,12 @@ local_action_response = function (msg,cb) {
     'user_id' : msg['user_id'],
     'user_creature' : msg['user_creature']
   })
-  // TODO: make the server keep track of cards played and when to emit that the stage is finished
-  // socket.stage1_cards_played += 1
-  // if(socket.stage1_cards_played == socket.room.length) {
-  //     socket.emit('stage1_finished_event',{})
-  // }
+  
   if (cb)
     cb();
+}
+
+stage1_response = function() {
+  console.log("here")
+  socket.emit('stage1_finished_event')
 }
