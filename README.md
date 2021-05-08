@@ -17,7 +17,7 @@
 
 3. Once in the virtual environment run 
 
-        pip install requirements.txt
+        pip install -r requirements.txt
 
 4. To start the application on your localhost:5000, run
 

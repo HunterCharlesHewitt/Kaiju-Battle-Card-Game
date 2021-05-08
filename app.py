@@ -3,7 +3,7 @@ from flask_socketio import SocketIO, emit, disconnect, join_room, rooms
 from utils.Godzilla import Godzilla
 from utils.Soda_Bottle import Soda_Bottle
 from utils.Creature import Creature
-from utils.utils import round_finished
+from utils.utils import round_finished, perform_defense
 from threading import Lock
 import json
 import logging
@@ -154,17 +154,7 @@ def global_action_event(message):
 #every event is calculated locally and no need for propagation
 @socket.on('stage1_finished_event')
 def stage1_finished_event():
-    for key,creature in session.items():
-        if isinstance(creature,Creature):
-            if(creature.round_damage_modifier < 0 and creature.round_defense_modifier > 0):
-                if(creature.round_defense_damage == len(creature.round_attackers)):
-                    for attacker in creature.round_attackers:
-                        session[key].send_unblockable_damage(attacker,1)
-                else:
-                    for idx,attacker in creature.round_attackers:
-                        session[key].send_unblockable_damage(attacker,creature.round_defense_damage // len(creature.round_attackers))
-                        if(idx == 0):
-                            session[key].send_unblockable_damage(attacker,creature.round_defense_damage % len(creature.round_attackers))
+    perform_defense()
     # the below code will need to be moved as more cards are added and more stages are available
     hp_message = round_finished()
     socket.emit('round_finished',hp_message,room=session['user_id'])
