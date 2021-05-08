@@ -59,7 +59,7 @@ local_action_response = function (msg,cb) {
     cb();
 }
 
-stage1_response = function() {
+stage1_response = function(msg) {
   console.log("here")
   socket.emit('stage1_finished_event')
 }

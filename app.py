@@ -2,6 +2,7 @@ from flask import Flask, render_template, session, copy_current_request_context,
 from flask_socketio import SocketIO, emit, disconnect, join_room, rooms
 from utils.Godzilla import Godzilla
 from utils.Soda_Bottle import Soda_Bottle
+from utils.Creature import Creature
 from threading import Lock
 import json
 import logging
@@ -142,14 +143,18 @@ def global_action_event(message):
 
     session['stage1_cards_played'] += 1
     if(session['stage1_cards_played'] == session['num_in_room']):
-        socket.emit('stage1_response')
-
+        socket.emit('stage1_response',message,room=session['user_id'])
     # print(str(session[target]))
     # print(str(session[user_id]))
 
 @socket.on('stage1_finished_event')
 def stage1_finished_event():
-    print("here")
+    for key,creature in session.items():
+        print(type(creature))
+        print(issubclass(type(creature),Creature))
+        print(creature)
+        if isinstance(creature,Creature):
+            print(creature)
 
 if __name__ == '__main__':
     logging.getLogger('socketio').setLevel(logging.ERROR)
