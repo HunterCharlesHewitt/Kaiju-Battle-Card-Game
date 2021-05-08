@@ -53,7 +53,7 @@ character_chosen_global =  function(msg,cb) {
         socket.room.forEach(function(item,index) {
             if(socket.id_to_character[item])
             {
-                var string = '<li syle="visibility:visible">';
+                var string = '<li syle="visibility:visible;font-size: x-large">';
                 string += socket.id_to_username[item] + ": ";
                 innerItem = socket.id_to_character[item]
                 string += (innerItem + (" (hp: <span id=hpSpan"+item+'>'+socket.hp+"</span>) "));

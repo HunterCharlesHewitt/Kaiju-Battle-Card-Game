@@ -63,3 +63,11 @@ stage1_response = function(msg) {
   console.log("here")
   socket.emit('stage1_finished_event')
 }
+
+round_finished = function(msg) {
+  for(var key of Object.keys(msg)) {
+    $('#hpSpan'+key).text(msg[key])
+    $('#userButton .creatureSelectButton').removeAttr('disabled');
+    $('.actionButton').removeAttr('disabled');
+  }
+}

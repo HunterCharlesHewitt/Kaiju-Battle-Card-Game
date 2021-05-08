@@ -6,6 +6,7 @@ class Creature:
         self.user_id = user_id
         self.hp = hp
         self.round_defense_modifier = 0
+        self.round_defense_damage = 0
         self.round_healing_modifier = 0
         self.round_unblockable_damage_modifier = 0
         self.round_damage_modifier = 0
@@ -34,6 +35,7 @@ class Creature:
         session[target_user_id].receive_unblockable_damage(modifier)  
 
     def receive_defense(self,modifier):
+        self.round_defense_damage += 1
         self.round_defense_modifier += modifier
     
     def receive_healing(self,modifier):
@@ -56,8 +58,10 @@ class Creature:
         return string
     
     
-    def end_round():
+    def end_round(self):
         self.round_defense_modifier = 0
+        self.round_defense_damage = 0
         self.round_healing_modifier = 0
         self.round_unblockable_damage_modifier = 0
-        self.round_damage_modifier = 0        
+        self.round_damage_modifier = 0
+        self.round_attackers = []     

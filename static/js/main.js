@@ -57,4 +57,5 @@ $(document).ready(function() {
     $('#playCards').submit(play_cards)
     socket.on('local_action_response', local_action_response)
     socket.on('stage1_response', stage1_response)
+    socket.on('round_finished', round_finished)
 });

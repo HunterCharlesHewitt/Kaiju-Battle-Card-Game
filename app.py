@@ -3,6 +3,7 @@ from flask_socketio import SocketIO, emit, disconnect, join_room, rooms
 from utils.Godzilla import Godzilla
 from utils.Soda_Bottle import Soda_Bottle
 from utils.Creature import Creature
+from utils.utils import round_finished
 from threading import Lock
 import json
 import logging
@@ -94,6 +95,7 @@ def first_ready(message):
 @socket.on('character_chosen_event')
 def character_chosen_event(message):
     session['stage1_cards_played'] = 0
+    session['stage2_cards_played'] = 0
     emit('character_chosen_local',
          {'character_id': message['character_id'], 'user_id': message['user_id']})
     emit('character_chosen_global',
@@ -143,18 +145,33 @@ def global_action_event(message):
 
     session['stage1_cards_played'] += 1
     if(session['stage1_cards_played'] == session['num_in_room']):
+        session['stage1_cards_played'] = 0
         socket.emit('stage1_response',message,room=session['user_id'])
     # print(str(session[target]))
     # print(str(session[user_id]))
 
+#perform defensive actions here, everyone has full state up to date local map of actions
+#every event is calculated locally and no need for propagation
 @socket.on('stage1_finished_event')
 def stage1_finished_event():
     for key,creature in session.items():
-        print(type(creature))
-        print(issubclass(type(creature),Creature))
-        print(creature)
         if isinstance(creature,Creature):
-            print(creature)
+            if(creature.round_damage_modifier < 0 and creature.round_defense_modifier > 0):
+                if(creature.round_defense_damage == len(creature.round_attackers)):
+                    for attacker in creature.round_attackers:
+                        session[key].send_unblockable_damage(attacker,1)
+                else:
+                    for idx,attacker in creature.round_attackers:
+                        session[key].send_unblockable_damage(attacker,creature.round_defense_damage // len(creature.round_attackers))
+                        if(idx == 0):
+                            session[key].send_unblockable_damage(attacker,creature.round_defense_damage % len(creature.round_attackers))
+    # the below code will need to be moved as more cards are added and more stages are available
+    hp_message = round_finished()
+    socket.emit('round_finished',hp_message,room=session['user_id'])
+
+
+                    
+
 
 if __name__ == '__main__':
     logging.getLogger('socketio').setLevel(logging.ERROR)
