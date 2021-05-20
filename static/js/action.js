@@ -38,6 +38,8 @@ play_cards = function (event) {
   $("#userButton .creatureSelectButton").attr("disabled", "disabled");
   $(".actionButton").attr("disabled", "disabled");
   $(".actionButton").css("background-color", "unset");
+  socket.target_creature_selected = null
+  socket.action_selected = null;
   return false;
 };
 
