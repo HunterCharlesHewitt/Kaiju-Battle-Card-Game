@@ -1,3 +1,4 @@
 /v2
 /node_modules
+/.vscode
 *.pyc
