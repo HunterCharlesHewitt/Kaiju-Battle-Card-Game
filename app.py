@@ -1,3 +1,4 @@
+from utils.Gamera import Gamera
 from flask import Flask, render_template, session, copy_current_request_context, url_for
 from flask_socketio import SocketIO, emit, disconnect, join_room, rooms
 from utils.Godzilla import Godzilla
@@ -113,6 +114,8 @@ def character_chosen_event_session(message):
         session[user_id] = Godzilla(user_id)
     elif(char_id == 'SodaBottle'):
         session[user_id] = Soda_Bottle(user_id)
+    elif(char_id == 'Gamera'):
+        session[user_id] = Gamera(user_id)
 
 
 @socket.on('start_battle')
@@ -135,6 +138,7 @@ def global_action_event(message):
     target = message['target_user_id']
     user_id = message['user_id']
     if(action == 'defend'):
+        print(session[user_id])
         session[user_id].defend(target)
     elif(action == 'heal'):
         session[user_id].heal(target)
