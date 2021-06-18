@@ -12,10 +12,13 @@ def perform_defense():
                     for attacker in creature.round_attackers:
                         session[key].send_unblockable_damage(attacker,-1)
                 else:
-                    for idx,attacker in creature.round_attackers:
+                    print(creature.round_attackers)
+                    idx = 0
+                    for attacker in creature.round_attackers:
                         session[key].send_unblockable_damage(attacker,(-1)*creature.round_defense_damage // len(creature.round_attackers))
                         if(idx == 0):
                             session[key].send_unblockable_damage(attacker,(-1)*(creature.round_defense_damage % len(creature.round_attackers)))
+                        idx +=1
 
 def round_finished():
 

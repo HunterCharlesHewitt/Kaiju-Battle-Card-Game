@@ -16,13 +16,13 @@ class Creature:
         self.send_damage(target_user_id,-5)
     
     def defend(self,target_user_id):
-        self.send_defense(target_user_id,5)
+        self.send_defense(target_user_id,5,1)
 
     def heal(self,target_user_id):
         self.send_healing(target_user_id,3)
 
-    def send_defense(self,target_user_id, modifier):
-        session[target_user_id].receive_defense(modifier)
+    def send_defense(self,target_user_id, modifier, dmg_modifier):
+        session[target_user_id].receive_defense(modifier, dmg_modifier)
 
     def send_healing(self,target_user_id, modifier):
         session[target_user_id].receive_healing(modifier)
@@ -34,8 +34,8 @@ class Creature:
     def send_unblockable_damage(self,target_user_id, modifier):
         session[target_user_id].receive_unblockable_damage(modifier)  
 
-    def receive_defense(self,modifier):
-        self.round_defense_damage += 1
+    def receive_defense(self,modifier, dmg_modifier):
+        self.round_defense_damage += dmg_modifier
         self.round_defense_modifier += modifier
     
     def receive_healing(self,modifier):
