@@ -15,6 +15,7 @@ alert_first_user_to_start_battle = function(msg,cb) {
 
 
 room_battle_start_response = function() {
+    $('#centerCardDiv').hide()
     $('#startBattle').hide()
     $('#header').hide()
     $('.creatureButton').hide()
