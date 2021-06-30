@@ -4,6 +4,7 @@ from flask_socketio import SocketIO, emit, disconnect, join_room, rooms
 from utils.Godzilla import Godzilla
 from utils.Soda_Bottle import Soda_Bottle
 from utils.Creature import Creature
+from models import db, User, Room
 from utils.utils import round_finished, perform_defense
 from threading import Lock
 import json
@@ -15,6 +16,10 @@ app.config['SECRET_KEY'] = 'secret!'
 socket = SocketIO(app, async_mode=async_mode)
 thread = None
 thread_lock = Lock()
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
+db.init_app(app)
+
+
 
 @app.route('/')
 def index():
