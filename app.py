@@ -4,7 +4,7 @@ from flask_socketio import SocketIO, emit, disconnect, join_room, rooms
 from utils.Godzilla import Godzilla
 from utils.Soda_Bottle import Soda_Bottle
 from utils.Creature import Creature
-from models import db, User, Room
+# from models import db, User, Room
 from utils.utils import round_finished, perform_defense
 from threading import Lock
 import json
@@ -17,7 +17,45 @@ socket = SocketIO(app, async_mode=async_mode)
 thread = None
 thread_lock = Lock()
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
-db.init_app(app)
+
+from flask_sqlalchemy import SQLAlchemy
+
+
+db = SQLAlchemy(app)
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(20),unique=True,nullable=False)
+    username = db.Column(db.String(20),unique=True,nullable=False)
+    password = db.Column(db.String(20),nullable=False)
+    current_room = db.Column(db.Integer,db.ForeignKey('room.id'))
+
+class Room(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    socket_key = db.Column(db.String(100),unique=True,nullable=False)
+    is_open = db.Column(db.Boolean, nullable=False,default=False)
+    has_battle_started = db.Column(db.Boolean, nullable=False,default=False)
+    users = db.relationship('User',backref='room',lazy=True)
+
+with app.app_context():
+    db.create_all()
+
+
+room = Room.query.filter_by(socket_key='room1').first()
+if(room):
+    db.session.delete(room)
+    db.session.commit()
+
+user = User.query.filter_by(username='michael').first()
+if(not user):
+    db.session.add(User(username='michael',password='1234567',email="1"))
+    db.session.commit()
+    db.session.add(User(username='hunter',password='1234567',email="2"))
+    db.session.commit()
+    db.session.add(User(username='nishan',password='1234567',email="3"))
+    db.session.commit()
+    db.session.add(User(username='hayden',password='1234567',email="4"))
+    db.session.commit()
 
 
 
@@ -78,6 +116,13 @@ def test_username_message(message):
 @socket.on('join')
 def join(message):
     session['room'] = message['room']
+    room = Room.query.filter_by(socket_key=message['room']).first()
+    if(not room):
+        room = Room(is_open=True, has_battle_started=False,socket_key=message['room'])
+    user = User.query.filter_by(username=session['username'].lower()).first()
+    room.users.append(user)
+    db.session.add(room)
+    db.session.commit()
     join_room(message['room'])
     emit('log_message_response',
          {'data': 'In rooms: ' + ', '.join(rooms())})
