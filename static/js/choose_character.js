@@ -50,13 +50,13 @@ character_chosen_global =  function(msg,cb) {
     if(socket.in_room) {
         $('#usersInRoom').removeClass("hidden")
         $('#usersInRoom').html("")
-        socket.room.forEach(function(item,index) {
+        socket.room.forEach(function(item) {
             if(socket.id_to_character[item])
             {
                 var string = '<li syle="visibility:visible;">';
                 string += socket.id_to_username[item] + ": ";
-                innerItem = socket.id_to_character[item]
-                string += (innerItem + (" (hp: <span style='font-size: x-large!important' id=hpSpan"+item+'>'+socket.hp+"</span>) "));
+                string += socket.id_to_character[item]
+                string += (" (hp: <span style='font-size: x-large!important' id=hpSpan"+item+'>'+socket.id_to_hp[item]+"</span>) ");
                 string += '</li>';
                 $('#usersInRoom').append(string);
             }
