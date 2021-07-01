@@ -61,6 +61,7 @@ if(not user):
 
 @app.route('/')
 def index():
+    print(session)
     return render_template('index.html', async_mode=socket.async_mode, filenames=
         {
             'Bard':url_for('static',filename='images/creatures/Bard.PNG'),
@@ -88,6 +89,12 @@ def log_message(message):
     emit('log_message_response',
          {'data': message['data']})
 
+#message['username']
+@socket.on('refresh_join_page')
+def refresh_join_page(message):
+    session['username'] = message['username']
+
+
 #message['data']
 @socket.on('broadcast_event')
 def log_broadcast_message(message):
@@ -101,6 +108,7 @@ def log_broadcast_message(message):
 def test_username_message(message):
     session['username'] = message['username']
     session['user_id'] = message['user_id']
+    print(session)
     emit('log_message_response',
          {'data': message['username'] + " has joined"},
          broadcast=True)

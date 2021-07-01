@@ -35,6 +35,7 @@ $(document).ready(function() {
     $('form#username').submit(submit_username);
     socket.on('username_global_response',username_global_response)
 
+
 //__________________join_room.js_________________________________
     $('form#join').submit(submit_join_room);
     socket.on('join_response_global', join_response_global)  
