@@ -2,26 +2,26 @@ from utils.Creature import Creature
 
 class Soda_Bottle(Creature):
 
-    def __init__(self,user_id):
-        super().__init__(user_id,20)
+    def __init__(self,username):
+        super().__init__(username,20)
         self.fizz_points = 0
         self.explode_target = None
 
-    def attack(self,target_user_id):
+    def attack(self,target_username):
         self.fizz_points += 1
-        super().attack(target_user_id)
+        super().attack(target_username)
 
-    def defend(self,target_user_id):
+    def defend(self,target_username):
         self.fizz_points += 1
-        super().defend(target_user_id)
+        super().defend(target_username)
 
-    def heal(self,target_user_id):
+    def heal(self,target_username):
         self.fizz_points += 1
-        super().heal(target_user_id)
+        super().heal(target_username)
 
-    def sp(self,target_user_id):
+    def sp(self,target_username):
         self.fizz_points -= 2 
-        super().send_damage(target_user_id,-7)
+        super().send_damage(target_username,-7)
 
     def receive_damage(self, modifier):
         super().receive_damage(modifier)

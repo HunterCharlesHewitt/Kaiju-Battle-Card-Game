@@ -4,7 +4,7 @@ submit_start_battle = function(event) {
 }
 
 alert_first_user_to_start_battle = function(msg,cb) {
-    if(msg.first_id == socket.id)
+    if(msg.first_id == getCookie('username'))
     {
         $('#startBattle').show()
     }
@@ -21,7 +21,7 @@ room_battle_start_response = function() {
     $('#waiting').hide()
     $('.battle').show()
     socket.room.forEach(function(item,index) {
-        innerItem = socket.id_to_character[item]
+        innerItem = socket.username_to_character[item]
         $('#userButton').append(`<button id="${innerItem + "SelectButton"}" class="creatureSelectButton">${innerItem}</button>`)
     })
 }

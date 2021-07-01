@@ -25,9 +25,9 @@ choose_target = function (event) {
 
 play_cards = function (event) {
   socket.emit("local_action_event", {
-    user_id: socket.id,
-    user_creature: socket.id_to_character[socket.id],
-    target_user_id: socket.character_to_id[socket.target_creature_selected],
+    username: getCookie('username'),
+    user_creature: socket.username_to_character[getCookie('username')],
+    target_username: socket.character_to_username[socket.target_creature_selected],
     target_creature: socket.target_creature_selected,
     action: socket.action_selected,
   });
@@ -44,16 +44,16 @@ play_cards = function (event) {
 };
 
 // msg['action']
-// msg['target_user_id']
+// msg['target_username']
 // msg['target_creature']
-// msg['user_id']
+// msg['username']
 // msg['user_creature']
 local_action_response = function (msg,cb) {
   socket.emit('global_action_event',{
     'action' : msg['action'],
-    'target_user_id' : msg['target_user_id'],
+    'target_username' : msg['target_username'],
     'target_creature' : msg['target_creature_id'],
-    'user_id' : msg['user_id'],
+    'username' : msg['username'],
     'user_creature' : msg['user_creature']
   })
   

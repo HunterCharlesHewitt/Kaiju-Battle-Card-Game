@@ -4,14 +4,19 @@ var socket = io();
 
 $(document).ready(function() {
 
+
+    if(getCookie("username").length != 0 && getCookie("in_game").length == 0){
+        $('#username').hide();
+        $('#join').show();
+    }
+
     $('.creatureButton').hover(creature_hover_enter, creature_hover_exit);
     
     //global information
     socket.room = [];
-    socket.id_to_username = {};
-    socket.id_to_character = {};
-    socket.id_to_hp = {};
-    socket.character_to_id = {};
+    socket.username_to_character = {}; //should be username to character
+    socket.username_to_hp = {}; //username to hp
+    socket.character_to_username = {}; //character to username
     socket.stage1_cards_played = 0;
     socket.global_round_actions = [];
     socket.id_to_creature_object = [];
