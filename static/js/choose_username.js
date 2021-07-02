@@ -8,7 +8,7 @@ username_global_response = function(msg,cb) {
 
 submit_username = function(event) {
     
-    socket.username = $('#username_data').val()
+    socket.username = $('#username_data').val().toLowerCase()
     localStorage.setItem("username",socket.username)
     socket.emit('username_event', {'username': $('#username_data').val(),'user_id':socket.id});
     $('#username').hide();

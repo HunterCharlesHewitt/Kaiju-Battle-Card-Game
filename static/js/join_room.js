@@ -1,8 +1,8 @@
 
 //msg.username
 join_response_global = function(msg,cb) {
-    if(!socket.room.includes(msg.username)) {
-        socket.room.push(msg.username)
+    if(!socket.room.includes(msg.username.toLowerCase())) {
+        socket.room.push(msg.username.toLowerCase())
         socket.emit('num_in_room',{'num_in_room': socket.room.length })
     }
     if (cb)
@@ -22,6 +22,8 @@ rejoin_room = function(msg) {
     console.log(users)
     //generalize below code into a function
     for(var username in users) { 
+        socket.room.push(username)
+
         console.log(username)
         $('#'+users[username]).attr('disabled','disabled');
         $('#'+users[username]).css('background','radial-gradient(circle, #423f3f, #080303)')

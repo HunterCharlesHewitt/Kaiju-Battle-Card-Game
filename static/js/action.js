@@ -67,7 +67,9 @@ stage1_response = function(msg) {
 }
 
 round_finished = function(msg) {
+  console.log(msg)
   for(var key of Object.keys(msg)) {
+    print(key)
     $('#hpSpan'+key).text(msg[key])
     $('#userButton .creatureSelectButton').removeAttr('disabled');
     $('.actionButton').removeAttr('disabled');

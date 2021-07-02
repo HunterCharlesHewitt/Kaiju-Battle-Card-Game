@@ -40,6 +40,7 @@ character_chosen_global =  function(msg,cb) {
     if(msg['remove_character'] != null) {
         $('#'+msg['remove_character']).removeAttr('disabled')
         $('#'+msg['remove_character']).css('background','radial-gradient(circle, #8b0000, #8b0000)')
+        delete socket.character_to_username[msg['remove_character']]
     }
     socket.emit('character_chosen_event_session', {'character_id':msg.character_id,'username':msg.username});
 

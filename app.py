@@ -1,5 +1,5 @@
 from utils.Gamera import Gamera
-from flask import Flask, render_template, session, copy_current_request_context, url_for
+from flask import Flask, render_template, session, copy_current_request_context, url_for,send_from_directory
 from flask_socketio import SocketIO, emit, disconnect, join_room, rooms
 from utils.Godzilla import Godzilla
 from utils.Soda_Bottle import Soda_Bottle
@@ -59,8 +59,6 @@ if(not user):
     db.session.add(User(username='hayden',password='1234567',email="4"))
     db.session.commit()
 
-
-
 @app.route('/')
 def index():
     return render_template('index.html', async_mode=socket.async_mode, filenames=
@@ -94,9 +92,11 @@ def client_disconnecting(message):
 #message['user_id']
 @socket.on('connect_response')
 def connect(message):
+    print(message['username'])
+    session['user_id'] = message['user_id']
     if(message["username"]):
-        session['username'] = message['username']
-    session["user_id"] = message["user_id"]
+        session['username'] = message['username'].lower()
+    session["socket_id"] = message["user_id"]
 
 #message['data']
 @socket.on('log_message_event')
@@ -116,13 +116,13 @@ def log_broadcast_message(message):
 #message['user_id']
 @socket.on('username_event')
 def test_username_message(message):
-    session['username'] = message['username']
+    session['username'] = message['username'].lower()
 
     emit('log_message_response',
-         {'data': message['username'] + " has joined"},
+         {'data': message['username'].lower() + " has joined"},
          broadcast=True)
     emit('username_global_response',
-         {'username': message['username']},
+         {'username': message['username'].lower()},
          broadcast=True)
 
 #message['room']
@@ -133,16 +133,25 @@ def test_username_message(message):
 #message['rejoin']
 @socket.on('join')
 def join(message):
+    session['stage1_cards_played'] = 0
+    session['stage2_cards_played'] = 0
     if('username' not in session):
-        session["username"] = message['username']
+        session["username"] = message['username'].lower()
     session['room'] = message['room']
     room = Room.query.filter_by(socket_key=message['room']).first()
     username_character_id_dict = {}
     if(message['rejoin']):
         for user in room.users:
             username_character_id_dict[user.username] = user.current_character_id
+            char_id = user.current_character_id
+            if(char_id == 'Godzilla'):
+                session[user.username] = Godzilla(user.username)
+            elif(char_id == 'SodaBottle'):
+                session[user.username] = Soda_Bottle(user.username)
+            elif(char_id == 'Gamera'):
+                session[user.username] = Gamera(user.username)
+        session['num_in_room'] = len(username_character_id_dict)
         emit('rejoin_room',{"users": username_character_id_dict})
-
     else:
         if(not room):
             room = Room(is_open=True, has_battle_started=False,socket_key=message['room'])
@@ -180,8 +189,6 @@ def first_ready(message):
 # message['username']
 @socket.on('character_chosen_event')
 def character_chosen_event(message):
-    session['stage1_cards_played'] = 0
-    session['stage2_cards_played'] = 0
     user = User.query.filter_by(username=session['username'].lower()).first()
     user.current_character_id = message['character_id']
     db.session.commit()
@@ -234,10 +241,12 @@ def global_action_event(message):
     elif(action == 'sp'):
         session[username].sp(target)
 
+    print(session['stage1_cards_played'])
+    print(session['num_in_room'])
     session['stage1_cards_played'] += 1
     if(session['stage1_cards_played'] == session['num_in_room']):
         session['stage1_cards_played'] = 0
-        socket.emit('stage1_response',message,room=session['username'])
+        socket.emit('stage1_response',message,room=session['socket_id'])
 
 #perform defensive actions here, everyone has full state up to date local map of actions
 #every event is calculated locally and no need for propagation
@@ -245,8 +254,9 @@ def global_action_event(message):
 def stage1_finished_event():
     perform_defense()
     # the below code will need to be moved as more cards are added and more stages are available
+    print(session['socket_id'])
     hp_message = round_finished()
-    socket.emit('round_finished',hp_message,room=session['user_id'])    
+    socket.emit('round_finished',hp_message,room='room1')    
 
 
 if __name__ == '__main__':

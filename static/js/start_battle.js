@@ -21,6 +21,7 @@ room_battle_start_response = function() {
     $('#waiting').hide()
     $('.battle').show()
     socket.room.forEach(function(item,index) {
+        console.log(item)
         innerItem = socket.username_to_character[item]
         $('#userButton').append(`<button id="${innerItem + "SelectButton"}" class="creatureSelectButton">${innerItem}</button>`)
     })

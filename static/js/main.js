@@ -31,7 +31,7 @@ $(document).ready(function() {
     socket.character_to_username = {}; //character to username
     socket.stage1_cards_played = 0;
     socket.global_round_actions = [];
-    socket.id_to_creature_object = [];
+
 
 
     //local information

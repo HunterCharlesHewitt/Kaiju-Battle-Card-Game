@@ -31,8 +31,8 @@ class Soda_Bottle(Creature):
         super().receive_unblockable_damage(modifier)
         self.explode_check()
 
-    def receive_defense(self, modifier):
-        super().receive_defense(modifier)
+    def receive_defense(self, modifier,dmg_modifier):
+        super().receive_defense(modifier,dmg_modifier)
         self.explode_check()
 
     def receive_healing(self, modifier):
