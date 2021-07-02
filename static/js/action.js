@@ -25,8 +25,8 @@ choose_target = function (event) {
 
 play_cards = function (event) {
   socket.emit("local_action_event", {
-    username: getCookie('username'),
-    user_creature: socket.username_to_character[getCookie('username')],
+    username: localStorage.getItem('username'),
+    user_creature: socket.username_to_character[localStorage.getItem('username')],
     target_username: socket.character_to_username[socket.target_creature_selected],
     target_creature: socket.target_creature_selected,
     action: socket.action_selected,

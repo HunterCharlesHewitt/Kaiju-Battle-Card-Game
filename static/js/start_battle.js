@@ -4,7 +4,7 @@ submit_start_battle = function(event) {
 }
 
 alert_first_user_to_start_battle = function(msg,cb) {
-    if(msg.first_id == getCookie('username'))
+    if(msg.first_id == localStorage.getItem('username'))
     {
         $('#startBattle').show()
     }

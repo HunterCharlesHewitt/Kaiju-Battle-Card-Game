@@ -30,6 +30,7 @@ class User(db.Model):
     password = db.Column(db.String(20),nullable=False)
     current_room = db.Column(db.Integer,db.ForeignKey('room.id'))
 
+
 class Room(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     socket_key = db.Column(db.String(100),unique=True,nullable=False)
@@ -83,11 +84,15 @@ def index():
     )
 
 #message['username']
+@socket.on('client_disconnecting')
+def client_disconnecting(message):
+    print("client is disconnecting: ")
+    print( message['username'])
+
+#message['username']
 #message['user_id']
 @socket.on('connect_response')
 def connect(message):
-    print("here")
-    print("*******************************")
     if(message["username"]):
         session['username'] = message['username']
     session["user_id"] = message["user_id"]
@@ -111,7 +116,7 @@ def log_broadcast_message(message):
 @socket.on('username_event')
 def test_username_message(message):
     session['username'] = message['username']
-    print(session)
+
     emit('log_message_response',
          {'data': message['username'] + " has joined"},
          broadcast=True)
@@ -124,23 +129,38 @@ def test_username_message(message):
 #message['username']
 #message['first_username']
 #message['users_in_room']
+#message['rejoin']
 @socket.on('join')
 def join(message):
+    if('username' not in session):
+        session["username"] = message['username']
     session['room'] = message['room']
     room = Room.query.filter_by(socket_key=message['room']).first()
-    if(not room):
-        room = Room(is_open=True, has_battle_started=False,socket_key=message['room'])
-    user = User.query.filter_by(username=session['username'].lower()).first()
-    room.users.append(user)
-    db.session.add(room)
-    db.session.commit()
-    join_room(message['room'])
-    emit('log_message_response',
-         {'data': 'In rooms: ' + ', '.join(rooms())})
-    emit('join_response_global', 
-            {'username':session['username']},
-            broadcast=True)
-    emit('join_response_local')
+    if(message['rejoin']):
+        json_users = [ob.username for ob in room.users]
+        emit('rejoin_room',{"users": json_users})
+        emit('join_response_local')
+    else:
+        if(not room):
+            room = Room(is_open=True, has_battle_started=False,socket_key=message['room'])
+            user = User.query.filter_by(username=session['username'].lower()).first()
+            user.current_room = message['room']
+            db.session.commit() #need to commmit but not just add for a new user
+            room.users.append(user)
+            db.session.add(room)
+            db.session.commit()
+        join_room(message['room'])
+        emit('log_message_response',
+            {'data': 'In rooms: ' + ', '.join(rooms())})
+        emit('join_response_global', 
+                {'username':session['username']},
+                broadcast=True)
+        emit('join_response_local')
+
+# message['room']
+@socket.on('populate_existing_room_data')
+def populate_existing_room_data(message):
+    room = Room.query.filter_by(socket_key=message['room']).first()
 
 # message['num_in_room']
 @socket.on('num_in_room')
@@ -219,10 +239,7 @@ def stage1_finished_event():
     perform_defense()
     # the below code will need to be moved as more cards are added and more stages are available
     hp_message = round_finished()
-    socket.emit('round_finished',hp_message,room=session['user_id'])
-
-
-                    
+    socket.emit('round_finished',hp_message,room=session['user_id'])    
 
 
 if __name__ == '__main__':

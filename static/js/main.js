@@ -4,10 +4,22 @@ var socket = io();
 
 $(document).ready(function() {
 
+    console.log("here")
+    if(localStorage.getItem("username")){
+        if(!localStorage.getItem("in_room") && localStorage.getItem("in_game") != "true") {
+            $('#username').hide();
+            $('#join').show();
+        }
+        else if (localStorage.getItem("in_room") && localStorage.getItem("in_game") != "true") {
+            $('#username').hide();
+            socket.emit('join',{room:localStorage.getItem("in_room"),username:localStorage.getItem("username"),rejoin:true})      
+            character_id = localStorage.getItem("character_id")
+            if(character_id) {
+                $('#'+character_id).attr('disabled','disabled');
+                $('#'+character_id).css('background','radial-gradient(circle, #423f3f, #080303)')             
+            }
+        }
 
-    if(getCookie("username").length != 0 && getCookie("in_game").length == 0){
-        $('#username').hide();
-        $('#join').show();
     }
 
     $('.creatureButton').hover(creature_hover_enter, creature_hover_exit);
@@ -44,6 +56,7 @@ $(document).ready(function() {
 //__________________join_room.js_________________________________
     $('form#join').submit(submit_join_room);
     socket.on('join_response_global', join_response_global)  
+    socket.on('rejoin_room',rejoin_room)
     socket.on('join_response_local', join_response_local);
 
 
@@ -65,3 +78,7 @@ $(document).ready(function() {
     socket.on('stage1_response', stage1_response)
     socket.on('round_finished', round_finished)
 });
+
+window.onbeforeunload = function () {
+    socket.emit('client_disconnecting', {'username':localStorage.getItem('username')});
+}

@@ -7,13 +7,14 @@ choose_character_button = function(event) {
     
     //FIXME
     socket.hp = 20
-    socket.emit('character_chosen_event', {'character_id': $(this).attr('id'), 'username': getCookie('username'), 'remove_character': socket.removeCharacter});
+    socket.emit('character_chosen_event', {'character_id': $(this).attr('id'), 'username': localStorage.getItem('username'), 'remove_character': socket.removeCharacter});
     return false;
 }
 
 // msg['character_id']
 // msg['username'] 
 character_chosen_local = function(msg,cb) {
+    localStorage.setItem("character_id",msg.character_id)
     $('#header').html((msg.character_id + " chosen"));
     if (cb)
         cb();
