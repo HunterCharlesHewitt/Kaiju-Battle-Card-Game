@@ -92,7 +92,6 @@ def client_disconnecting(message):
 #message['user_id']
 @socket.on('connect_response')
 def connect(message):
-    print(message['username'])
     session['user_id'] = message['user_id']
     if(message["username"]):
         session['username'] = message['username'].lower()
@@ -131,12 +130,15 @@ def test_username_message(message):
 #message['first_username']
 #message['users_in_room']
 #message['rejoin']
+#message['socket_id']
 @socket.on('join')
 def join(message):
     session['stage1_cards_played'] = 0
     session['stage2_cards_played'] = 0
     if('username' not in session):
         session["username"] = message['username'].lower()
+    if('socket_id' not in session):
+        session['socket_id'] = message['socket_id']
     session['room'] = message['room']
     room = Room.query.filter_by(socket_key=message['room']).first()
     username_character_id_dict = {}
@@ -241,12 +243,10 @@ def global_action_event(message):
     elif(action == 'sp'):
         session[username].sp(target)
 
-    print(session['stage1_cards_played'])
-    print(session['num_in_room'])
     session['stage1_cards_played'] += 1
     if(session['stage1_cards_played'] == session['num_in_room']):
         session['stage1_cards_played'] = 0
-        socket.emit('stage1_response',message,room=session['socket_id'])
+        socket.emit('stage1_response',message,room=session["socket_id"])
 
 #perform defensive actions here, everyone has full state up to date local map of actions
 #every event is calculated locally and no need for propagation
@@ -254,9 +254,8 @@ def global_action_event(message):
 def stage1_finished_event():
     perform_defense()
     # the below code will need to be moved as more cards are added and more stages are available
-    print(session['socket_id'])
     hp_message = round_finished()
-    socket.emit('round_finished',hp_message,room='room1')    
+    socket.emit('round_finished',hp_message,session["socket_id"])    
 
 
 if __name__ == '__main__':

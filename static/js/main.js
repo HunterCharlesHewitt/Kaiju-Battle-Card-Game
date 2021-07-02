@@ -12,12 +12,8 @@ $(document).ready(function() {
         }
         else if (localStorage.getItem("in_room") && localStorage.getItem("in_game") != "true") {
             $('#username').hide();
-            socket.emit('join',{room:localStorage.getItem("in_room"),username:localStorage.getItem("username"),rejoin:true})      
+            socket.emit('join',{room:localStorage.getItem("in_room"),username:localStorage.getItem("username"),rejoin:true,socket_id:socket.id})      
             character_id = localStorage.getItem("character_id")
-            if(character_id) {
-                $('#'+character_id).attr('disabled','disabled');
-                $('#'+character_id).css('background','radial-gradient(circle, #423f3f, #080303)')             
-            }
         }
 
     }

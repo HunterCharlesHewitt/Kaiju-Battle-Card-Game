@@ -34,6 +34,20 @@ rejoin_room = function(msg) {
     
         socket.username_to_hp[username] = 20
     }
+
+    $('#usersInRoom').removeClass("hidden")
+    $('#usersInRoom').html("")
+    socket.room.forEach(function(item,index) {
+        if(socket.username_to_character[item])
+        {
+            var string = '<li syle="visibility:visible;">';
+            string += item + ": ";
+            innerItem = socket.username_to_character[item]
+            string += (innerItem + (" (hp: <span style='font-size: x-large!important' id=hpSpan"+item+'>'+socket.username_to_hp[item]+"</span>) "));
+            string += '</li>';
+            $('#usersInRoom').append(string);
+        }
+    });
 }
 
 submit_join_room = function(event) {
@@ -46,6 +60,6 @@ submit_join_room = function(event) {
             first_user_ready = socket.room[0]
     }
     var stringRoom = JSON.stringify(socket.room);
-    socket.emit('join', {rejoin:false,'room': 'room1','room_size': roomLength, 'username': localStorage.getItem("username"), 'first_username': first_user_ready,'users_in_room':stringRoom});
+    socket.emit('join', {rejoin:false,'room': 'room1','room_size': roomLength, 'username': localStorage.getItem("username"), 'first_username': first_user_ready,'users_in_room':stringRoom,socket_id:socket.id});
     return false;
 }
