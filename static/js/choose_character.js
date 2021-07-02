@@ -3,10 +3,9 @@ choose_character_button = function(event) {
     if(socket.character){
         socket.removeCharacter = socket.character
     }
-    socket.character = id_str;
-    
-    //FIXME
-    socket.hp = 20
+    else if(localStorage.getItem("character_id")){
+        socket.removeCharacter = localStorage.getItem("character_id")
+    }
     socket.emit('character_chosen_event', {'character_id': $(this).attr('id'), 'username': localStorage.getItem('username'), 'remove_character': socket.removeCharacter});
     return false;
 }
@@ -14,6 +13,10 @@ choose_character_button = function(event) {
 // msg['character_id']
 // msg['username'] 
 character_chosen_local = function(msg,cb) {
+    socket.character =  msg['character_id'];
+    
+    //FIXME
+    socket.hp = 20
     localStorage.setItem("character_id",msg.character_id)
     $('#header').html((msg.character_id + " chosen"));
     if (cb)

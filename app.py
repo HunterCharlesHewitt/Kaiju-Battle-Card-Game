@@ -29,6 +29,7 @@ class User(db.Model):
     username = db.Column(db.String(20),unique=True,nullable=False)
     password = db.Column(db.String(20),nullable=False)
     current_room = db.Column(db.Integer,db.ForeignKey('room.id'))
+    current_character_id = db.Column(db.String(20))
 
 
 class Room(db.Model):
@@ -136,26 +137,29 @@ def join(message):
         session["username"] = message['username']
     session['room'] = message['room']
     room = Room.query.filter_by(socket_key=message['room']).first()
+    username_character_id_dict = {}
     if(message['rejoin']):
-        json_users = [ob.username for ob in room.users]
-        emit('rejoin_room',{"users": json_users})
-        emit('join_response_local')
+        for user in room.users:
+            username_character_id_dict[user.username] = user.current_character_id
+        emit('rejoin_room',{"users": username_character_id_dict})
+
     else:
         if(not room):
             room = Room(is_open=True, has_battle_started=False,socket_key=message['room'])
-            user = User.query.filter_by(username=session['username'].lower()).first()
-            user.current_room = message['room']
-            db.session.commit() #need to commmit but not just add for a new user
-            room.users.append(user)
-            db.session.add(room)
-            db.session.commit()
-        join_room(message['room'])
-        emit('log_message_response',
-            {'data': 'In rooms: ' + ', '.join(rooms())})
-        emit('join_response_global', 
-                {'username':session['username']},
-                broadcast=True)
-        emit('join_response_local')
+        user = User.query.filter_by(username=session['username'].lower()).first()
+        user.current_room = message['room']
+        db.session.commit() #need to commmit but not just add for a new user
+        room.users.append(user)
+        print("adding user {}",user.username)
+        db.session.add(room)
+        db.session.commit()
+    join_room(message['room'])
+    emit('log_message_response',
+        {'data': 'In rooms: ' + ', '.join(rooms())})
+    emit('join_response_global', 
+            {'username':session['username']},
+            broadcast=True)
+    emit('join_response_local')
 
 # message['room']
 @socket.on('populate_existing_room_data')
@@ -178,6 +182,9 @@ def first_ready(message):
 def character_chosen_event(message):
     session['stage1_cards_played'] = 0
     session['stage2_cards_played'] = 0
+    user = User.query.filter_by(username=session['username'].lower()).first()
+    user.current_character_id = message['character_id']
+    db.session.commit()
     emit('character_chosen_local',
          {'character_id': message['character_id'], 'username': message['username']})
     emit('character_chosen_global',

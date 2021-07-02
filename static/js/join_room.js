@@ -18,6 +18,20 @@ join_response_local = function() {
 
 rejoin_room = function(msg) {
     console.log(msg)
+    users = msg['users']
+    console.log(users)
+    //generalize below code into a function
+    for(var username in users) { 
+        console.log(username)
+        $('#'+users[username]).attr('disabled','disabled');
+        $('#'+users[username]).css('background','radial-gradient(circle, #423f3f, #080303)')
+        
+        socket.character_to_username[users[username]] = username
+
+        socket.username_to_character[username] = users[username]
+    
+        socket.username_to_hp[username] = 20
+    }
 }
 
 submit_join_room = function(event) {
