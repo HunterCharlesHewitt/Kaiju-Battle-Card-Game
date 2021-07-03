@@ -29,8 +29,26 @@ class User(db.Model):
     username = db.Column(db.String(20),unique=True,nullable=False)
     password = db.Column(db.String(20),nullable=False)
     current_room = db.Column(db.Integer,db.ForeignKey('room.id'))
+    battle_id = db.Column(db.Integer,db.ForeignKey('battle.id'))
     current_character_id = db.Column(db.String(20))
+    current_character_hp = db.Column(db.Integer)
 
+class Action(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    performing_username =  db.Column(db.String(20),nullable=False)
+    performing_character =  db.Column(db.String(20),nullable=False)
+    target_username =  db.Column(db.String(20),nullable=False)
+    target_character =  db.Column(db.String(20),nullable=False)
+    action = db.Column(db.String(20),nullable=False)
+    round = db.Column(db.Integer)
+    battle_id = db.Column(db.Integer,db.ForeignKey('battle.id'))
+
+class Battle(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    actions = db.relationship('Action',backref='battle',lazy=True)
+    winner_username = db.Column(db.String(20))
+    users = db.relationship('User',backref='battle',lazy=True)
+    room = db.Column(db.Integer, unique=True) #more like room_socket_id
 
 class Room(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -38,12 +56,16 @@ class Room(db.Model):
     is_open = db.Column(db.Boolean, nullable=False,default=False)
     has_battle_started = db.Column(db.Boolean, nullable=False,default=False)
     users = db.relationship('User',backref='room',lazy=True)
+    battle = db.Column(db.Integer)
 
 with app.app_context():
     db.create_all()
 
 
 room = Room.query.filter_by(socket_key='room1').first()
+Battle.query.delete()
+Action.query.delete()
+db.session.commit()
 if(room):
     db.session.delete(room)
     db.session.commit()
@@ -137,6 +159,7 @@ def join(message):
     session['stage2_cards_played'] = 0
     if('username' not in session):
         session["username"] = message['username'].lower()
+    print(message)
     if('socket_id' not in session):
         session['socket_id'] = message['socket_id']
     session['room'] = message['room']
@@ -160,17 +183,19 @@ def join(message):
         user = User.query.filter_by(username=session['username'].lower()).first()
         user.current_room = message['room']
         db.session.commit() #need to commmit but not just add for a new user
-        room.users.append(user)
+        if(user not in room.users):
+            room.users.append(user)
         print("adding user {}",user.username)
         db.session.add(room)
         db.session.commit()
     join_room(message['room'])
-    emit('log_message_response',
-        {'data': 'In rooms: ' + ', '.join(rooms())})
-    emit('join_response_global', 
+    if(not message['in_game']):
+        emit('log_message_response',
+            {'data': 'In rooms: ' + ', '.join(rooms())})
+        emit('join_response_global', 
             {'username':session['username']},
             broadcast=True)
-    emit('join_response_local')
+        emit('join_response_local')
 
 # message['room']
 @socket.on('populate_existing_room_data')
@@ -193,6 +218,7 @@ def first_ready(message):
 def character_chosen_event(message):
     user = User.query.filter_by(username=session['username'].lower()).first()
     user.current_character_id = message['character_id']
+    user.current_character_hp = Creature.base_hp() #fixme should look up a list or something
     db.session.commit()
     emit('character_chosen_local',
          {'character_id': message['character_id'], 'username': message['username']})
@@ -214,10 +240,34 @@ def character_chosen_event_session(message):
     elif(char_id == 'Gamera'):
         session[username] = Gamera(username)
 
-
+# message['room']
+# message['users']
 @socket.on('start_battle')
 def start_battle(message):
+    battle = Battle(room=message['room'])
+    for user in message['users']:
+        db_user = User.query.filter_by(username=user.lower()).first()
+        db_user.battle_id = battle.id
+        db.session.commit()
+        battle.users.append(db_user)
+    db.session.add(battle)
+    db.session.commit()
     emit('room_battle_start_response',room=message['room'])
+
+# message['username']
+# message['room']
+@socket.on('rejoin_battle_event') 
+def rejoin_battle_event(message):
+    user = User.query.filter_by(username=message['username']).first()
+    room = Room.query.filter_by(socket_key=message['room']).first()
+    username_to_character = {}
+    username_to_hp = {}
+    for user in room.users:
+        username_to_character[user.username] = user.current_character_id
+        username_to_hp[user.current_character_id] = user.current_character_hp
+    emit('rejoin_battle_response',{'username_to_character': username_to_character, 'username_to_hp':username_to_hp})
+
+
 
 # message['action']
 # message['target_username']
@@ -230,6 +280,17 @@ def local_action_event(message):
 
 @socket.on('global_action_event')
 def global_action_event(message):
+    print(message)
+    battle = Battle.query.filter_by(room=session['room']).first()
+    action = Action(battle_id=battle.id
+                    ,action=message['action']
+                    ,performing_username=message['username']
+                    ,target_username=message['target_username']
+                    ,performing_character=message['user_creature']
+                    ,target_character=message['target_creature'])
+    battle.actions.append(action)
+    db.session.add(action)
+    db.session.commit()
 
     action = message['action']
     target = message['target_username']

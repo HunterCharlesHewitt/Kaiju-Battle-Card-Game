@@ -60,6 +60,6 @@ submit_join_room = function(event) {
             first_user_ready = socket.room[0]
     }
     var stringRoom = JSON.stringify(socket.room);
-    socket.emit('join', {rejoin:false,'room': 'room1','room_size': roomLength, 'username': localStorage.getItem("username"), 'first_username': first_user_ready,'users_in_room':stringRoom,socket_id:socket.id});
+    socket.emit('join', {rejoin:false,'room': 'room1','room_size': roomLength, 'username': localStorage.getItem("username"), 'first_username': first_user_ready,'users_in_room':stringRoom,'socket_id':socket.id,'in_game':false});
     return false;
 }

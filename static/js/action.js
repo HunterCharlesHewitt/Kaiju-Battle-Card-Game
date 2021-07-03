@@ -49,10 +49,11 @@ play_cards = function (event) {
 // msg['username']
 // msg['user_creature']
 local_action_response = function (msg,cb) {
+  console.log(msg)
   socket.emit('global_action_event',{
     'action' : msg['action'],
     'target_username' : msg['target_username'],
-    'target_creature' : msg['target_creature_id'],
+    'target_creature' : msg['target_creature'],
     'username' : msg['username'],
     'user_creature' : msg['user_creature']
   })

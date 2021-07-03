@@ -12,8 +12,13 @@ $(document).ready(function() {
         }
         else if (localStorage.getItem("in_room") && localStorage.getItem("in_game") != "true") {
             $('#username').hide();
-            socket.emit('join',{room:localStorage.getItem("in_room"),username:localStorage.getItem("username"),rejoin:true,socket_id:socket.id})      
+            socket.emit('join',{room:localStorage.getItem("in_room"),username:localStorage.getItem("username"),rejoin:true,'socket_id':socket.id,'in_game':false})      
             character_id = localStorage.getItem("character_id")
+        }
+        else if (localStorage.getItem("in_room") && localStorage.getItem("in_game") == "true"){
+            $('#username').hide();
+            socket.emit('join',{room:localStorage.getItem("in_room"),username:localStorage.getItem("username"),rejoin:true,'socket_id':socket.id,'in_game':true})      
+            socket.emit('rejoin_battle_event',{username:localStorage.getItem("username"),room:localStorage.getItem("in_room")})
         }
 
     }
@@ -63,6 +68,7 @@ $(document).ready(function() {
 
 //__________________start_battle.js________________________________
     $('form#startBattle').submit(submit_start_battle);
+    socket.on('rejoin_battle_response',rejoin_battle_response)
     socket.on('alert_first_user',alert_first_user_to_start_battle);
     socket.on('room_battle_start_response',room_battle_start_response);
 

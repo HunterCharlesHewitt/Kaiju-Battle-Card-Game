@@ -2,6 +2,10 @@ from flask import session
 
 class Creature:
 
+    @staticmethod 
+    def base_hp():
+        return 20
+
     def __init__(self,username,hp):
         self.username = username
         self.hp = hp
