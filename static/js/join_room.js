@@ -14,6 +14,21 @@ join_response_local = function() {
     $('.creatureButton').colorList()
     $('#join').hide()
     $('#waiting').show();
+
+    for(var username in users) { 
+        socket.room.push(username)
+
+        console.log(username)
+        $('#'+users[username]).attr('disabled','disabled');
+        $('#'+users[username]).css('background','radial-gradient(circle, #423f3f, #080303)')
+        
+        socket.character_to_username[users[username]] = username
+
+        socket.username_to_character[username] = users[username]
+    
+        socket.username_to_hp[username] = 20
+    }
+
 }
 
 rejoin_room = function(msg) {

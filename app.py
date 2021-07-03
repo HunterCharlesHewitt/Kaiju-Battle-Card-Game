@@ -209,7 +209,7 @@ def num_in_room(message):
 
 @socket.on('first_ready')
 def first_ready(message):
-    emit('alert_first_user',{'first_id':message['first_id_ready']}, broadcast=True)
+    emit('alert_first_user',{'first_id':message['first_id_ready']}, room=message['room'])
 
 # message['remove_character']
 # message['character_id']
