@@ -195,7 +195,7 @@ def join(message):
         emit('join_response_global', 
             {'username':session['username']},
             broadcast=True)
-        emit('join_response_local')
+        emit('join_response_local',{"users": username_character_id_dict})
 
 # message['room']
 @socket.on('populate_existing_room_data')

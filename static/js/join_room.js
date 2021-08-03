@@ -9,13 +9,14 @@ join_response_global = function(msg,cb) {
         cb();
 }
 
-join_response_local = function() {
+//msg.users
+join_response_local = function(msg) {
     $('.creatureButton').show()
     $('.creatureButton').colorList()
     $('#join').hide()
     $('#waiting').show();
-
-    for(var username in users) { 
+    console.log(msg)
+    for(var username in msg.users) { 
         socket.room.push(username)
 
         console.log(username)
