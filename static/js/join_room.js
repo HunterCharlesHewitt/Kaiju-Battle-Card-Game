@@ -16,6 +16,7 @@ join_response_local = function(msg) {
     $('#join').hide()
     $('#waiting').show();
     console.log(msg)
+    users = msg.users
     for(var username in msg.users) { 
         socket.room.push(username)
 

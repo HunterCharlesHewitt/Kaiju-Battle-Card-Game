@@ -165,7 +165,7 @@ def join(message):
     session['room'] = message['room']
     room = Room.query.filter_by(socket_key=message['room']).first()
     username_character_id_dict = {}
-    if(message['rejoin']):
+    if(room):
         for user in room.users:
             username_character_id_dict[user.username] = user.current_character_id
             char_id = user.current_character_id
@@ -175,7 +175,8 @@ def join(message):
                 session[user.username] = Soda_Bottle(user.username)
             elif(char_id == 'Gamera'):
                 session[user.username] = Gamera(user.username)
-        session['num_in_room'] = len(username_character_id_dict)
+            session['num_in_room'] = len(username_character_id_dict)
+    if(message['rejoin']):
         emit('rejoin_room',{"users": username_character_id_dict})
     else:
         if(not room):
