@@ -46,6 +46,16 @@ $(document).ready(function() {
 
 //__________________connect.js__________________________________
     $('form#broadcast').submit(broadcast);
+    $('#logout').click(function() {
+        localStorage.clear()
+        location.reload()
+    })
+    $('#leaveRoom').click(function() {
+        localStorage.removeItem("character_id")
+        localStorage.removeItem("in_room")
+        localStorage.removeItem("in_game")
+        location.reload()
+    })
     socket.on('connect',connect);
     socket.on('log_message_response', log_message_response);
 

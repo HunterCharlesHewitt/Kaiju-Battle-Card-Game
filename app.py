@@ -176,11 +176,10 @@ def join(message):
             elif(char_id == 'Gamera'):
                 session[user.username] = Gamera(user.username)
             session['num_in_room'] = len(username_character_id_dict)
+    else:
+        room = Room(is_open=True, has_battle_started=False,socket_key=message['room'])
     if(message['rejoin']):
         emit('rejoin_room',{"users": username_character_id_dict})
-    else:
-        if(not room):
-            room = Room(is_open=True, has_battle_started=False,socket_key=message['room'])
         user = User.query.filter_by(username=session['username'].lower()).first()
         user.current_room = message['room']
         db.session.commit() #need to commmit but not just add for a new user
