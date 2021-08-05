@@ -178,16 +178,19 @@ def join(message):
             session['num_in_room'] = len(username_character_id_dict)
     else:
         room = Room(is_open=True, has_battle_started=False,socket_key=message['room'])
+    user = User.query.filter_by(username=session['username'].lower()).first()
+    user.current_room = message['room']
+    db.session.commit()
     if(message['rejoin']):
         emit('rejoin_room',{"users": username_character_id_dict})
-        user = User.query.filter_by(username=session['username'].lower()).first()
-        user.current_room = message['room']
-        db.session.commit() #need to commmit but not just add for a new user
-        if(user not in room.users):
-            room.users.append(user)
+    if(user not in room.users):
+        room.users.append(user)
         print("adding user {}",user.username)
-        db.session.add(room)
-        db.session.commit()
+    db.session.add(room)
+    db.session.commit()
+    print("___________________")
+    print(Room.query.all()[0].users)
+    print(room.users)
     join_room(message['room'])
     if(not message['in_game']):
         emit('log_message_response',
@@ -201,6 +204,25 @@ def join(message):
 @socket.on('populate_existing_room_data')
 def populate_existing_room_data(message):
     room = Room.query.filter_by(socket_key=message['room']).first()
+
+# message['username']
+# message['room']
+@socket.on('leave_room_event')
+def leave_room_event(message):
+    print(message)
+    print(Room.query.all()[0].users)
+    print(Room.query.all())
+    user = User.query.filter_by(username=message['username'].lower()).first()
+    room = Room.query.filter_by(socket_key=message['room']).first()
+    print(room.users)
+    user.current_room = ""
+    user.battle_id = ""
+    user.current_character_id = ""
+    user.current_character_hp = ""
+    room.users.remove(user)
+    db.session.commit()
+
+    emit('leave_room_global',{'username':message['username']}, room=message['room'])
 
 # message['num_in_room']
 @socket.on('num_in_room')
