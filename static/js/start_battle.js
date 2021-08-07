@@ -26,17 +26,17 @@ rejoin_battle_response = function(msg) {
     socket.username_to_hp = msg.username_to_hp
     socket.room.forEach(function(item,index) {
         console.log(item)
-        innerItem = socket.username_to_character[item]
+        innerItem = msg.username_to_character[item]
         $('#userButton').append(`<button id="${innerItem + "SelectButton"}" class="creatureSelectButton">${innerItem}</button>`)
     })  
-    for(username in socket.room) {
-        $('#hpSpan'+username).text(socket.username_to_hp[username])
+    for(username in msg.username_to_character) {
+        $('#hpSpan'+username).text(msg.username_to_hp[username])
         $('#userButton .creatureSelectButton').removeAttr('disabled');
         $('.actionButton').removeAttr('disabled');
     }
 }
 
-
+//TODO pass in users from db here
 room_battle_start_response = function() {
     localStorage.setItem('in_game','true')
     $('#startBattle').hide()

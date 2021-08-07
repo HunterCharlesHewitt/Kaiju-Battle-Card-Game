@@ -33,6 +33,8 @@ join_response_local = function(msg) {
 
 }
 
+//msg.users
+//msg.username_to_hp
 rejoin_room = function(msg) {
     console.log(msg)
     users = msg['users']
@@ -49,13 +51,13 @@ rejoin_room = function(msg) {
 
         socket.username_to_character[username] = users[username]
     
-        socket.username_to_hp[username] = 20
+        socket.username_to_hp[username] = msg.username_to_hp[username]
     }
 
     $('#usersInRoom').removeClass("hidden")
     $('#usersInRoom').html("")
     socket.room.forEach(function(item,index) {
-        if(socket.username_to_character[item])
+        if(socket.username_to_character[item] && $("#hpSpan"+item).length == 0)
         {
             var string = '<li syle="visibility:visible;">';
             string += item + ": ";

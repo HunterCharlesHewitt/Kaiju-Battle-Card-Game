@@ -69,6 +69,7 @@ stage1_response = function(msg) {
 
 round_finished = function(msg) {
   console.log(msg)
+  socket.username_to_hp = msg
   for(var key of Object.keys(msg)) {
     $('#hpSpan'+key).text(msg[key])
     $('#userButton .creatureSelectButton').removeAttr('disabled');

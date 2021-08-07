@@ -165,9 +165,11 @@ def join(message):
     session['room'] = message['room']
     room = Room.query.filter_by(socket_key=message['room']).first()
     username_character_id_dict = {}
+    username_to_hp_dict = {}
     if(room):
         for user in room.users:
             username_character_id_dict[user.username] = user.current_character_id
+            username_to_hp_dict[user.username] = user.current_character_hp
             char_id = user.current_character_id
             if(char_id == 'Godzilla'):
                 session[user.username] = Godzilla(user.username)
@@ -182,7 +184,7 @@ def join(message):
     user.current_room = message['room']
     db.session.commit()
     if(message['rejoin']):
-        emit('rejoin_room',{"users": username_character_id_dict})
+        emit('rejoin_room',{"users": username_character_id_dict, "username_to_hp":username_to_hp_dict})
     if(user not in room.users):
         room.users.append(user)
         print("adding user {}",user.username)
@@ -197,7 +199,7 @@ def join(message):
             {'data': 'In rooms: ' + ', '.join(rooms())})
         emit('join_response_global', 
             {'username':session['username']},
-            broadcast=True)
+            room=message['room'])
         emit('join_response_local',{"users": username_character_id_dict})
 
 # message['room']
@@ -286,7 +288,7 @@ def rejoin_battle_event(message):
     username_to_hp = {}
     for user in room.users:
         username_to_character[user.username] = user.current_character_id
-        username_to_hp[user.current_character_id] = user.current_character_hp
+        username_to_hp[user.username] = user.current_character_hp
     emit('rejoin_battle_response',{'username_to_character': username_to_character, 'username_to_hp':username_to_hp})
 
 
@@ -338,6 +340,10 @@ def stage1_finished_event():
     perform_defense()
     # the below code will need to be moved as more cards are added and more stages are available
     hp_message = round_finished()
+    for key in hp_message.keys():
+        user = User.query.filter_by(username=key).first()
+        user.current_character_hp = hp_message[key]
+        db.session.commit()
     socket.emit('round_finished',hp_message,session["socket_id"])    
 
 

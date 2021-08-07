@@ -56,7 +56,8 @@ character_chosen_global =  function(msg,cb) {
         $('#usersInRoom').removeClass("hidden")
         $('#usersInRoom').html("")
         socket.room.forEach(function(item,index) {
-            if(socket.username_to_character[item])
+            console.log($("#hpSpan"+item).length == 0)
+            if(socket.username_to_character[item] && $("#hpSpan"+item).length == 0)
             {
                 var string = '<li syle="visibility:visible;">';
                 string += item + ": ";
