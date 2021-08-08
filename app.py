@@ -300,7 +300,7 @@ def rejoin_battle_event(message):
 # message['user_creature']
 @socket.on('local_action_event')
 def local_action_event(message):
-    emit('local_action_response',message, room=session['room'])
+    emit('local_action_response',message)
 
 @socket.on('global_action_event')
 def global_action_event(message):
